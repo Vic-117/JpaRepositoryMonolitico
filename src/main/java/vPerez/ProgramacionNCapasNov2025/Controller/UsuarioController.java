@@ -48,10 +48,7 @@ import vPerez.ProgramacionNCapasNov2025.DAO.MunicipioDAOImplementation;
 import vPerez.ProgramacionNCapasNov2025.DAO.MunicipioJpaDAOImplementation;
 import vPerez.ProgramacionNCapasNov2025.DAO.PaisDAOImplementation;
 import vPerez.ProgramacionNCapasNov2025.DAO.PaisJpaDAOImplementation;
-import vPerez.ProgramacionNCapasNov2025.DAO.RolDAOImplementation;
-import vPerez.ProgramacionNCapasNov2025.DAO.RolJpaDAOImplementation;
 import vPerez.ProgramacionNCapasNov2025.DAO.UsuarioDAOImplementation;
-import vPerez.ProgramacionNCapasNov2025.DAO.UsuarioJpaDAOImplementation;
 import vPerez.ProgramacionNCapasNov2025.ML.Colonia;
 import vPerez.ProgramacionNCapasNov2025.ML.Direccion;
 import vPerez.ProgramacionNCapasNov2025.ML.ErrorCarga;
@@ -59,6 +56,8 @@ import vPerez.ProgramacionNCapasNov2025.ML.Pais;
 import vPerez.ProgramacionNCapasNov2025.ML.Result;
 import vPerez.ProgramacionNCapasNov2025.ML.Rol;
 import vPerez.ProgramacionNCapasNov2025.ML.Usuario;
+import vPerez.ProgramacionNCapasNov2025.service.DireccionService;
+import vPerez.ProgramacionNCapasNov2025.service.RolService;
 import vPerez.ProgramacionNCapasNov2025.service.UsuarioService;
 import vPerez.ProgramacionNCapasNov2025.service.ValidationService;
 
@@ -69,11 +68,9 @@ public class UsuarioController {
     @Autowired //Inyeccion automatica de dependencias
     private UsuarioDAOImplementation usuarioDaoImplementation;
 
-    @Autowired
-    private RolDAOImplementation rolDaoImplementation;
 
-    @Autowired
-    private DireccionDAOImplementation direccionDaoImplementation;
+//    @Autowired
+//    private DireccionDAOImplementation direccionDaoImplementation;
 
     @Autowired
     private PaisDAOImplementation paisDaoImplementation;
@@ -90,11 +87,6 @@ public class UsuarioController {
     @Autowired
     private ValidationService ValidationService;
 
-    @Autowired
-    private UsuarioJpaDAOImplementation usuarioJpaDAOImplementation;
-
-    @Autowired
-    private RolJpaDAOImplementation rolJpaDAOImplementation;
 
     @Autowired
     private DireccionJpaDAOImplementation direccionJpaDAOImplementation;
@@ -115,6 +107,13 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
+    @Autowired
+    private RolService rolService;
+    
+    @Autowired
+    private DireccionService direccionService;
+    
     @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
 
@@ -123,8 +122,8 @@ public class UsuarioController {
         
         model.addAttribute("Usuarios", result.Objects);
         model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
-//        Result resultRoles = rolDaoImplementation.getAll();
-        Result resultRoles = rolJpaDAOImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+//        Result resultRoles = rol
         model.addAttribute("Roles", resultRoles.Objects);
         model.addAttribute("usuariosEstatus", result.Objects);
         return "Index";
@@ -133,7 +132,7 @@ public class UsuarioController {
     @GetMapping("UsuarioDireccionForm")
     public String showAlumnoDireccion(Model model, RedirectAttributes redirectAttributes) {
 //        Result resultPais = paisDaoImplementation.getAll();
-        Result result = rolJpaDAOImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = rolService.getAll();
         Result resultPais = paisJpaDAOImplementation.getAll();
         model.addAttribute("Roles", result.Objects);
         model.addAttribute("Paises", resultPais.Objects);
@@ -149,7 +148,7 @@ public class UsuarioController {
 
             if (bindingResult.hasErrors()) {
 //                Result result = rolDaoImplementation.getAll();
-                Result result = rolJpaDAOImplementation.getAll();
+                vPerez.ProgramacionNCapasNov2025.JPA.Result result = rolService.getAll();
                 model.addAttribute("Roles", result.Objects);
                 model.addAttribute("Usuario", usuario);
 //                if (result.Correct) {
@@ -208,8 +207,12 @@ public class UsuarioController {
 
         } else if ((usuario.getIdUsuario() > 0 && usuario.direcciones.get(0).getIdDireccion() == 0)) { // agregar direccion
             ModelMapper modelMapper = new ModelMapper();
+//            Direccion direccion = new Direccion();
+//            usuario.direcciones.add(direccion);
             vPerez.ProgramacionNCapasNov2025.JPA.Direccion direccionJpa = modelMapper.map(usuario.direcciones.get(0), vPerez.ProgramacionNCapasNov2025.JPA.Direccion.class);
-            Result resultAddDireccion = direccionJpaDAOImplementation.add(direccionJpa, usuario.getIdUsuario());
+            direccionJpa.Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
+            direccionJpa.Usuario.setIdUsuario(usuario.getIdUsuario());
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultAddDireccion = direccionService.add(direccionJpa);
             if (resultAddDireccion.Correct) {
                 redirectAttributes.addFlashAttribute("resultadoOperacion", resultAddDireccion.Object);
             }
@@ -266,8 +269,8 @@ public class UsuarioController {
 //        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
 //        Result resultRol = rolDaoImplementation.getAll();
 //        Result resultPais = paisDaoImplementation.getAll();
-        Result result = usuarioJpaDAOImplementation.getDireccionUsuarioById(idUsuario);
-        Result resultRol = rolJpaDAOImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
         Result resultPais = paisJpaDAOImplementation.getAll();
         model.addAttribute("Paises", resultPais.Objects);
 //        Result resultUsuario = usuarioDaoImplementation.GetById(idUsuario);
@@ -289,11 +292,12 @@ public class UsuarioController {
 
     @GetMapping("direccionForm/{idUsuario}")
     @ResponseBody
-    public Result getDireccion(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getDireccion(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
 //        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
-        Result result = usuarioJpaDAOImplementation.getDireccionUsuarioById(idUsuario);
+//        Result result = usuarioJpaDAOImplementation.getDireccionUsuarioById(idUsuario);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
 
-        Result resultRol = rolDaoImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
 
 //        redirectAttributes.addFlashAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
         model.addAttribute("UsuarioD", result.Objects);
@@ -525,7 +529,7 @@ public class UsuarioController {
                 usuariosJPA.add(usuarioJPA);
             }
 //            usuarioDaoImplementation.AddMany(usuarios);
-            Result resultCargaMasiva = usuarioJpaDAOImplementation.addMany(usuariosJPA);
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultCargaMasiva = usuarioService.addAll(usuariosJPA);
 
         } else {
             //Guardando usuarios de la lista de usuarios creada con el metodo leer archivo
@@ -537,7 +541,8 @@ public class UsuarioController {
                 usuariosJPA.add(usuarioJPA);
             }
 //            usuarioDaoImplementation.AddMany(usuarios);
-            usuarioJpaDAOImplementation.addMany(usuariosJPA);
+//            usuarioJpaDAOImplementation.addMany(usuariosJPA);
+            usuarioService.addAll(usuariosJPA);
 
         }
         sesion.removeAttribute("archivoCargaMasiva");
@@ -553,9 +558,9 @@ public class UsuarioController {
 
         ModelMapper modelMapper = new ModelMapper();
         vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
-        Result resultSearch = usuarioJpaDAOImplementation.GetAllDinamico(usuarioJPA);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultSearch = usuarioService.getDinamico(usuarioJPA);
 
-        Result resultRoles = rolDaoImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
         model.addAttribute("Roles", resultRoles.Objects);
         model.addAttribute("Usuarios", resultSearch.Objects);
         model.addAttribute("usuariosEstatus", resultSearch.Objects);
