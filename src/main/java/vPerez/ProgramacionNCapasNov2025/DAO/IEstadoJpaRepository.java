@@ -5,13 +5,12 @@
 package vPerez.ProgramacionNCapasNov2025.DAO;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import vPerez.ProgramacionNCapasNov2025.JPA.Usuario;
+import vPerez.ProgramacionNCapasNov2025.JPA.Estado;
 
 /**
  *
  * @author digis
  */
-public interface IUsuarioJpaRepository extends JpaRepository<Usuario, Integer> {
-
+public interface IEstadoJpaRepository extends JpaRepository<Estado, Integer>{
     
 }

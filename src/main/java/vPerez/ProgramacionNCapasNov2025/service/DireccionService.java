@@ -45,5 +45,49 @@ public class DireccionService{
         return result;
     }
     
+    @Transactional
+    public Result update(Direccion direccion){
+        Result result = new Result();
+        
+        try {
+            direccionJpaRepository.save(direccion);
+            
+        } catch (Exception ex) {
+        }
+        return result;
+    }
+    
+     @Transactional
+    public Result getById(int idDireccion) {
+        Result result = new Result();
+        try {
+            Optional<Direccion> direccion =direccionJpaRepository.findById(idDireccion);
+            result.Object = direccion.get();
+            result.Correct = true;
+
+        } catch (Exception e) {
+            result.Correct = false;
+            result.ErrorMessage = e.getLocalizedMessage();
+            result.ex = e;
+        }
+        return result;
+    }
+    
+    @Transactional
+    public Result delete(int idDireccion){
+        Result result = new Result();
+        try {
+            Direccion direccion = direccionJpaRepository.findById(idDireccion).get();
+            direccionJpaRepository.delete(direccion);
+            result.Correct = true;
+            
+        } catch (Exception ex) {
+            result.Correct = false;
+            result.ex = ex;
+            result.ErrorMessage = ex.getLocalizedMessage();
+        }
+        return result;
+    }
+    
     
 }

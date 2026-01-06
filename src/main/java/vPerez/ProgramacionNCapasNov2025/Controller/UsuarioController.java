@@ -56,7 +56,11 @@ import vPerez.ProgramacionNCapasNov2025.ML.Pais;
 import vPerez.ProgramacionNCapasNov2025.ML.Result;
 import vPerez.ProgramacionNCapasNov2025.ML.Rol;
 import vPerez.ProgramacionNCapasNov2025.ML.Usuario;
+import vPerez.ProgramacionNCapasNov2025.service.ColoniaService;
 import vPerez.ProgramacionNCapasNov2025.service.DireccionService;
+import vPerez.ProgramacionNCapasNov2025.service.EstadoService;
+import vPerez.ProgramacionNCapasNov2025.service.MunicipioService;
+import vPerez.ProgramacionNCapasNov2025.service.PaisService;
 import vPerez.ProgramacionNCapasNov2025.service.RolService;
 import vPerez.ProgramacionNCapasNov2025.service.UsuarioService;
 import vPerez.ProgramacionNCapasNov2025.service.ValidationService;
@@ -114,6 +118,18 @@ public class UsuarioController {
     @Autowired
     private DireccionService direccionService;
     
+    @Autowired
+    private PaisService paisService;
+    
+    @Autowired
+    private EstadoService estadoService;
+    
+    @Autowired
+    private MunicipioService municipioService;
+    
+    @Autowired
+    private ColoniaService coloniaService;
+    
     @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
 
@@ -133,7 +149,7 @@ public class UsuarioController {
     public String showAlumnoDireccion(Model model, RedirectAttributes redirectAttributes) {
 //        Result resultPais = paisDaoImplementation.getAll();
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = rolService.getAll();
-        Result resultPais = paisJpaDAOImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultPais = paisService.getAll();
         model.addAttribute("Roles", result.Objects);
         model.addAttribute("Paises", resultPais.Objects);
         model.addAttribute("Usuario", new Usuario());
@@ -201,7 +217,8 @@ public class UsuarioController {
             vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
             usuarioJPA.direcciones.get(0).Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
             usuarioJPA.direcciones.get(0).Usuario.setIdUsuario(usuario.getIdUsuario());
-            Result resultUpdateDireccion = direccionJpaDAOImplementation.update(usuarioJPA.direcciones.get(0));
+//            Result resultUpdateDireccion = direccionJpaDAOImplementation.update(usuarioJPA.direcciones.get(0));
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultUpdateDireccion = direccionService.update(usuarioJPA.direcciones.get(0));
             return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
 //            return "redirect:/Usuario";
 
@@ -255,7 +272,7 @@ public class UsuarioController {
 
     @GetMapping("direccion/delete/{idDireccion}/{idUsuario}")
     public String deleteDireccion(@PathVariable("idDireccion") int idDireccion, @PathVariable("idUsuario") String idUsuario, RedirectAttributes redirectAttributes) {
-        Result resultDelete = direccionJpaDAOImplementation.delete(idDireccion);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultDelete = direccionService.delete(idDireccion);
         if (resultDelete.Correct) {
             redirectAttributes.addFlashAttribute("resultadoOperacion", resultDelete.Object);
         }
@@ -266,12 +283,12 @@ public class UsuarioController {
 
     @GetMapping("detail/{idUsuario}")
     public String getUsuario(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
-//        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
+        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
 //        Result resultRol = rolDaoImplementation.getAll();
 //        Result resultPais = paisDaoImplementation.getAll();
-        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
+//        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
-        Result resultPais = paisJpaDAOImplementation.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultPais = paisService.getAll();
         model.addAttribute("Paises", resultPais.Objects);
 //        Result resultUsuario = usuarioDaoImplementation.GetById(idUsuario);
         model.addAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
@@ -292,40 +309,42 @@ public class UsuarioController {
 
     @GetMapping("direccionForm/{idUsuario}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result getDireccion(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getDireccion(@PathVariable("idDireccion") int idDireccion, Model model, RedirectAttributes redirectAttributes) {
 //        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
 //        Result result = usuarioJpaDAOImplementation.getDireccionUsuarioById(idUsuario);
-        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = direccionService.getById(idDireccion);
 
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
 
-//        redirectAttributes.addFlashAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
-        model.addAttribute("UsuarioD", result.Objects);
+        redirectAttributes.addFlashAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
+        model.addAttribute("UsuarioD", result.Object);
 
         return result;
     }
 
     @GetMapping("getEstadoByPais/{idPais}")
     @ResponseBody
-    public Result getEstadoByPais(@PathVariable int idPais) {
-        Result result = estadoJpaDAOImplementation.getByPais(idPais);
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result  getEstadoByPais(@PathVariable int idPais) {
+//        Result result = estadoJpaDAOImplementation.getByPais(idPais);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = estadoService.getByPais(idPais);
 
         return result;
     }
 
     @GetMapping("getMunicipioByEstado/{idEstado}")
     @ResponseBody
-    public Result getMunicipioByEstado(@PathVariable("idEstado") int idEstado) {
-//        Result result = municipioDaoImplementation.getByEstado(idEstado);
-        Result result = municipioJpaDAOImplementation.getByEstado(idEstado);
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getMunicipioByEstado(@PathVariable("idEstado") int idEstado) {
+//        Result result = municipioJpaDAOImplementation.getByEstado(idEstado);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = municipioService.getByEstado(idEstado);
+
         return result;
     }
 
     @GetMapping("getColoniaByMunicipio/{idMunicipio}")
     @ResponseBody
-    public Result getColoniaByMunicipio(@PathVariable("idMunicipio") int idMunicipio) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getColoniaByMunicipio(@PathVariable("idMunicipio") int idMunicipio) {
 //        Result result = coloniaDaoImplementation.getColoniaByMunicipio(idMunicipio);
-        Result result = coloniaJpaDAOImplementation.getByMunicipio(idMunicipio);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = coloniaService.getByMuncipio(idMunicipio);
         return result;
     }
 
