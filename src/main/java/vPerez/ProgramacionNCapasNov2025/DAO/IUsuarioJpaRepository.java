@@ -12,6 +12,8 @@ import vPerez.ProgramacionNCapasNov2025.JPA.Usuario;
  * @author digis
  */
 public interface IUsuarioJpaRepository extends JpaRepository<Usuario, Integer> {
+    
+    Usuario findByEmail(String email);
 
     
 }

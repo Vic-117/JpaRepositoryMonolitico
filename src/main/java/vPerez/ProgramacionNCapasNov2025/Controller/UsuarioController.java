@@ -192,24 +192,26 @@ public class UsuarioController {
             }
 
         } else if (usuario.getIdUsuario() > 0 && usuario.direcciones == null) { // editar usuario
+            try{
+                usuario.setPassword(usuario.getPassword());
+                usuario.direcciones = new ArrayList<>();
+                usuario.direcciones.add(new Direccion());
+                ModelMapper modelMapper = new ModelMapper();
 
-            usuario.setPassword(usuario.getPassword());
-            usuario.direcciones = new ArrayList<>();
-            usuario.direcciones.add(new Direccion());
-            ModelMapper modelMapper = new ModelMapper();
+                vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioEntidad = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
 
-            vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioEntidad = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
+                vPerez.ProgramacionNCapasNov2025.JPA.Result resultUpdateUsuario = usuarioService.update(usuarioEntidad);
 
-            vPerez.ProgramacionNCapasNov2025.JPA.Result resultUpdateUsuario = usuarioService.update(usuarioEntidad);
-
-            if (resultUpdateUsuario.Correct) {
-                resultUpdateUsuario.Object = "Exito al actualizar";
-            } else {
-                resultUpdateUsuario.Object = "Error al actualizar";
+                if (resultUpdateUsuario.Correct) {
+                    resultUpdateUsuario.Object = "Exito al actualizar";
+                } else {
+                    resultUpdateUsuario.Object = "Error al actualizar";
+                }
+                redirectAttributes.addFlashAttribute("resultadoUpdate", resultUpdateUsuario);
+            }catch(Exception ex){
+                return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
             }
-            redirectAttributes.addFlashAttribute("resultadoUpdate", resultUpdateUsuario);
 //            return "detalleUsuario";
-            return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
 
         } else if ((usuario.getIdUsuario() > 0 && usuario.direcciones.get(0).getIdDireccion() > 0)) { // editar direccion
 

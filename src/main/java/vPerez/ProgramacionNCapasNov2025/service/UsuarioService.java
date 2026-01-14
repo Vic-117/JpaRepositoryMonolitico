@@ -25,11 +25,18 @@ import vPerez.ProgramacionNCapasNov2025.JPA.Result;
 @Service
 public class UsuarioService {
 
-    @Autowired
+    @Autowired 
     private IUsuarioJpaRepository usuarioJpaRepository;
     @Autowired
     private IDireccionJpaRepository direccionJpaRepository;
 
+   
+//    public UsuarioService(IUsuarioJpaRepository usuarioJpaRepository) {
+//        this.usuarioJpaRepository = usuarioJpaRepository;
+//        
+//    }
+    
+    
     @Transactional
 public Result getAll() {
         Result result = new Result();
