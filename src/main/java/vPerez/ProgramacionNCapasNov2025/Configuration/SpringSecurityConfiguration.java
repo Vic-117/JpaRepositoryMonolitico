@@ -29,23 +29,24 @@ public class SpringSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(config -> config.requestMatchers("/Usuario/**")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
+        http.authorizeHttpRequests(config -> config.requestMatchers("/Usuario/**","/login")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
                 .hasAnyRole("Administrador").anyRequest().authenticated()
         )
                 .formLogin(
                         form -> form
                                 .defaultSuccessUrl("/Usuario", true)
-//                                .loginPage("/login")
-//                                .loginProcessingUrl("/signin")
-//                                .failureUrl("/login?error=true")
-//                                .permitAll()
-//                )
+                                .usernameParameter("email")
+                                .loginPage("/login")//Url del endpoint de la pagina
+                                .loginProcessingUrl("/signin")//endpoint para procesar formulario() manejado por sprinf security(Es lo mismo que se escribe en el formulario)
+                                .failureUrl("/login?error=true")
+                                .permitAll()
+                )
 //                .logout(
 //                        logout -> logout
 //                                .logoutUrl("/logout")
 //                                .logoutSuccessUrl("/login?logout=true")
 //                                .permitAll()
-                )
+//                )
                 .userDetailsService(userDetailsService);
 
         return http.build();

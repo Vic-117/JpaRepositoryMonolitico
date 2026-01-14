@@ -3,13 +3,37 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
 -->
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     </head>
-    <body>
-        <!--<div>TODO write content</div>-->
+    <body class="container p-5 d-flex justify-content-center align-items-center flex-column" style="height: 100vh; background-color: whitesmoke">
+        <div class="container border rounded  w-50 h-100 p-4 d-flex justify-content-center  align-items-center" style=" flex-direction: column; background-color: #BDD5F9;">
+
+            <!--<h1 class="text-center fw-bold" style="font-size: 3.5vw; ">Iniciar Sesión</h1>-->
+
+            <!--<i class="bi bi-person-square" style="font-size: 10vw; color: red"></i>-->
+            <!--<i class="bi bi-person-bounding-box"  style="font-size: 10vw;"></i>-->
+            <i class="bi bi-person-circle"  style="font-size: 10vw;  color: whitesmoke"></i>
+            <!--FORMULARIO-->
+            <form class="container w-75 h-75 pt-5 " th:action="@{/signin}" method="post">
+
+                <label class="form-label fw-bold row">Correo</label>
+                <input type="text" required class="form-control row mb-3" name="email">
+
+                <label class="form-label fw-bold row">Contraseña:</label>
+                <input type="password" required class="form-control row mb-3" name="password">
+                <hr class="row">
+                <button type="submit" class="btn btn-outline-success row w-100 fw-bold">Iniciar Sesión</button>
+
+                </label>
+
+            </form>
+        </div>
     </body>
 </html>

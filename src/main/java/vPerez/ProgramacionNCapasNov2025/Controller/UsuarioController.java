@@ -130,6 +130,11 @@ public class UsuarioController {
     @Autowired
     private ColoniaService coloniaService;
     
+    @GetMapping("/login")
+    public String login(){
+        return "Login";
+    }
+    
     @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
 
@@ -285,7 +290,7 @@ public class UsuarioController {
 
     @GetMapping("detail/{idUsuario}")
     public String getUsuario(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
-        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
 //        Result resultRol = rolDaoImplementation.getAll();
 //        Result resultPais = paisDaoImplementation.getAll();
 //        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
