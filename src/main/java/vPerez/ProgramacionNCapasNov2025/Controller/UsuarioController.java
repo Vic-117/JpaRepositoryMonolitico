@@ -23,6 +23,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -130,24 +132,30 @@ public class UsuarioController {
     @Autowired
     private ColoniaService coloniaService;
     
-    @GetMapping("/login")
-    public String login(){
-        return "Login";
-    }
+    
     
     @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
-
-        //model permite cargar informacion desde el backend en la vistas(frontend)
-        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll();
+        Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = aut.getPrincipal();
         
-        model.addAttribute("Usuarios", result.Objects);
-        model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
-        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+        String nombreRol =aut.getAuthorities().iterator().next().getAuthority();
+//        model permite cargar informacion desde el backend en la vistas(frontend)
+        if(nombreRol.equals("ROLE_Usuario")){
+            
+           int idUsuario = (Integer)usuarioService.getIdByEmail(aut.getName()).Object;
+            return "redirect:/Usuario/detail/"+idUsuario;
+        }else{
+            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll();
+            model.addAttribute("UsuarioAutenticado", principal);
+            model.addAttribute("Usuarios", result.Objects);
+            model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
 //        Result resultRoles = rol
-        model.addAttribute("Roles", resultRoles.Objects);
-        model.addAttribute("usuariosEstatus", result.Objects);
-        return "Index";
+            model.addAttribute("Roles", resultRoles.Objects);
+            model.addAttribute("usuariosEstatus", result.Objects);
+            return "Index";
+        }
     }
 
     @GetMapping("UsuarioDireccionForm")
@@ -277,7 +285,7 @@ public class UsuarioController {
         return resultSoftDel;
     }
 
-    @GetMapping("direccion/delete/{idDireccion}/{idUsuario}")
+    @DeleteMapping("direccion/delete/{idDireccion}/{idUsuario}")
     public String deleteDireccion(@PathVariable("idDireccion") int idDireccion, @PathVariable("idUsuario") String idUsuario, RedirectAttributes redirectAttributes) {
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultDelete = direccionService.delete(idDireccion);
         if (resultDelete.Correct) {

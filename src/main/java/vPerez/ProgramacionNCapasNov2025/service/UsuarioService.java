@@ -27,20 +27,17 @@ import vPerez.ProgramacionNCapasNov2025.JPA.Result;
 @Service
 public class UsuarioService {
 
-    @Autowired 
+    @Autowired
     private IUsuarioJpaRepository usuarioJpaRepository;
     @Autowired
     private IDireccionJpaRepository direccionJpaRepository;
 
-   
 //    public UsuarioService(IUsuarioJpaRepository usuarioJpaRepository) {
 //        this.usuarioJpaRepository = usuarioJpaRepository;
 //        
 //    }
-    
-    
     @Transactional
-public Result getAll() {
+    public Result getAll() {
         Result result = new Result();
         try {
 //            result.Objects = new ArrayList<>();
@@ -59,8 +56,8 @@ public Result getAll() {
         Result result = new Result();
         try {
             PasswordEncoder encoder = new BCryptPasswordEncoder();
-            usuario.setPassword( encoder.encode(usuario.getPassword()));
-            
+            usuario.setPassword(encoder.encode(usuario.getPassword()));
+
             usuarioJpaRepository.save(usuario);
             usuario.direcciones.get(0).Usuario = new Usuario();
             usuario.direcciones.get(0).Usuario.setIdUsuario(usuario.getIdUsuario());
@@ -149,7 +146,7 @@ public Result getAll() {
 
         Result result = new Result();
         try {
-            
+
             //Para encontrar un objeto igual
             ExampleMatcher matcher = ExampleMatcher.matching()
                     .withIgnorePaths("idUsuario", "rol.nombre")
@@ -157,7 +154,7 @@ public Result getAll() {
                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
             usuario.setEstatus(1);
-            
+
             if (usuario.rol.getIdRol() == 0) {
                 matcher = matcher.withIgnorePaths("idRol");//ignora ese atributo
                 usuario.rol = null;
@@ -166,25 +163,25 @@ public Result getAll() {
                 matcher = matcher.withIgnorePaths("apellidoMaterno");
                 usuario.setApellidoMaterno(null);
             } else {
-                 matcher = matcher.withMatcher("apellidoMaterno",
-                         ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());//agrega regla de busqueda del atributo
+                matcher = matcher.withMatcher("apellidoMaterno",
+                        ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());//agrega regla de busqueda del atributo
 
             }
             if (usuario.getApellidoPaterno() == "") {
                 usuario.setApellidoPaterno(null);
                 matcher = matcher.withIgnorePaths("apellidoPaterno");
-            }else{
-                 matcher = matcher.withMatcher("apellidoPaterno",
-                         ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-            
+            } else {
+                matcher = matcher.withMatcher("apellidoPaterno",
+                        ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
             }
             if (usuario.getNombre() == "") {
                 usuario.setNombre(null);
                 matcher = matcher.withIgnorePaths("nombre");
-            }else{
-                 matcher = matcher.withMatcher("nombre",
-                         ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-            
+            } else {
+                matcher = matcher.withMatcher("nombre",
+                        ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
             }
             Example<Usuario> ejemplo = Example.of(usuario, matcher);//ejemplo de busqueda, con el usuario y el buscador
             List<Usuario> listaU = usuarioJpaRepository.findAll(ejemplo);//busca varios objetos basandose en el ejemplo
@@ -196,10 +193,10 @@ public Result getAll() {
         }
         return result;
     }//AGREGADO DOMINGO
-    
+
     @Transactional
-    public Result addAll(List<Usuario> usuarios){//PROBAR, AGREGADO DOMINGO
-        
+    public Result addAll(List<Usuario> usuarios) {//PROBAR, AGREGADO DOMINGO
+
         Result result = new Result();
         try {
             usuarioJpaRepository.saveAllAndFlush(usuarios);
@@ -210,7 +207,21 @@ public Result getAll() {
             result.ex = e;
         }
         return result;
-    
+
+    }
+
+    @Transactional
+    public Result getIdByEmail(String email) {
+        Result result = new Result();
+        try {
+            result.Object =  usuarioJpaRepository.findByEmail(email).getIdUsuario();
+            result.Correct = true;
+        } catch (Exception ex) {
+            result.Correct = false;
+            result.ErrorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
     }
 
 }

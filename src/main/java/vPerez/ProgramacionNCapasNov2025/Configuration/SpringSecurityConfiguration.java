@@ -30,7 +30,7 @@ public class SpringSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(config -> config.requestMatchers("/Usuario/**","/login")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
-                .hasAnyRole("Administrador").anyRequest().authenticated()
+                .hasAnyRole("Administrador","Usuario").anyRequest().authenticated()
         )
                 .formLogin(
                         form -> form
