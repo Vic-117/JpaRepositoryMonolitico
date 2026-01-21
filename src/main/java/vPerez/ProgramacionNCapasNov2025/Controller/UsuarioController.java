@@ -17,6 +17,7 @@ import java.util.List;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Base64;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -74,10 +75,8 @@ public class UsuarioController {
     @Autowired //Inyeccion automatica de dependencias
     private UsuarioDAOImplementation usuarioDaoImplementation;
 
-
 //    @Autowired
 //    private DireccionDAOImplementation direccionDaoImplementation;
-
     @Autowired
     private PaisDAOImplementation paisDaoImplementation;
 
@@ -92,7 +91,6 @@ public class UsuarioController {
 
     @Autowired
     private ValidationService ValidationService;
-
 
     @Autowired
     private DireccionJpaDAOImplementation direccionJpaDAOImplementation;
@@ -113,41 +111,41 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
-    
+
     @Autowired
     private RolService rolService;
-    
+
     @Autowired
     private DireccionService direccionService;
-    
+
     @Autowired
     private PaisService paisService;
-    
+
     @Autowired
     private EstadoService estadoService;
-    
+
     @Autowired
     private MunicipioService municipioService;
-    
+
     @Autowired
     private ColoniaService coloniaService;
-    
-    
-    
+
     @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
+
         Authentication aut = SecurityContextHolder.getContext().getAuthentication();
         Object principal = aut.getPrincipal();
-        
-        String nombreRol =aut.getAuthorities().iterator().next().getAuthority();
+        String nombreRol = aut.getAuthorities().iterator().next().getAuthority();
 //        model permite cargar informacion desde el backend en la vistas(frontend)
-        if(nombreRol.equals("ROLE_Usuario")){
-            
-           int idUsuario = (Integer)usuarioService.getIdByEmail(aut.getName()).Object;
-            return "redirect:/Usuario/detail/"+idUsuario;
-        }else{
+        int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
+        if (nombreRol.equals("ROLE_Usuario")) {
+            return "redirect:/Usuario/detail/" + idUsuario;
+        } else {
             vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll();
+            model.addAttribute("idUsuario", idUsuario);
             model.addAttribute("UsuarioAutenticado", principal);
+            model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
+
             model.addAttribute("Usuarios", result.Objects);
             model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
             vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
@@ -170,9 +168,21 @@ public class UsuarioController {
     }
 
     @PostMapping("add")
-    public String addAlumnoDireccion(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-//      usuario.setEstatus(1);
-//        CAMBIAR METODO PARA ACTUALIZAR USUARIO
+    public String addAlumnoDireccion(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, 
+            @ModelAttribute("imagen") MultipartFile imagen, @ModelAttribute("imagen") String imagenPerfil) {
+//        imagen.getBytes();
+        try {
+            if (imagen != null && imagen.getSize() > 0) {
+                String extension = imagen.getOriginalFilename().split("\\.")[1];
+                if (extension.equals("jpg") || extension.equals("jpg") || extension.equals("jpeg")) {
+                    usuario.setImagen(Base64.getEncoder().encodeToString(imagen.getBytes()));
+                }
+            }else{
+                usuario.setImagen(imagenPerfil);
+            }
+        } catch (Exception ex) {
+            ex.getCause();
+        }
         if (usuario.getIdUsuario() == 0 && usuario.direcciones.get(0).getIdDireccion() == 0) { // agregar usuario direccion
 
             if (bindingResult.hasErrors()) {
@@ -180,32 +190,26 @@ public class UsuarioController {
                 vPerez.ProgramacionNCapasNov2025.JPA.Result result = rolService.getAll();
                 model.addAttribute("Roles", result.Objects);
                 model.addAttribute("Usuario", usuario);
-//                if (result.Correct) {
-//                    redirectAttributes.addFlashAttribute("ErroresC", result.Correct);
-//                } else {
-//                    redirectAttributes.addFlashAttribute("ErroresC", result.Correct);
-//                }
-                return "Usuario";
+
+                return "UsuarioDireccionForm";
             } else {
-                //AGREGADO RECIENTEMENTE SOLO EL IF
+            //AGREGADO RECIENTEMENTE SOLO EL IF
+            ModelMapper modelMapper = new ModelMapper();
 
-                ModelMapper modelMapper = new ModelMapper();
+            vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJpa = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
 
-                vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJpa = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
+            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.add(usuarioJpa);
 
-                vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.add(usuarioJpa);
-
-                if (!result.Correct) {
-                    model.addAttribute("ErroresC", "Sucedio un error.");
-                    return "UsuarioDireccionForm";
-                }
-
-                redirectAttributes.addFlashAttribute("ResultAgregar", "El usuario se agregó con exito"); // Agregado
-
+            if (!result.Correct) {
+                model.addAttribute("ErroresC", "Sucedio un error.");
+                return "UsuarioDireccionForm";
             }
 
+            redirectAttributes.addFlashAttribute("ResultAgregar", "El usuario se agregó con exito"); // Agregado
+
+            }
         } else if (usuario.getIdUsuario() > 0 && usuario.direcciones == null) { // editar usuario
-            try{
+            try {
                 usuario.setPassword(usuario.getPassword());
                 usuario.direcciones = new ArrayList<>();
                 usuario.direcciones.add(new Direccion());
@@ -221,19 +225,22 @@ public class UsuarioController {
                     resultUpdateUsuario.Object = "Error al actualizar";
                 }
                 redirectAttributes.addFlashAttribute("resultadoUpdate", resultUpdateUsuario);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
             }
 //            return "detalleUsuario";
 
         } else if ((usuario.getIdUsuario() > 0 && usuario.direcciones.get(0).getIdDireccion() > 0)) { // editar direccion
-
-            ModelMapper modelMapper = new ModelMapper();
-            vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
-            usuarioJPA.direcciones.get(0).Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
-            usuarioJPA.direcciones.get(0).Usuario.setIdUsuario(usuario.getIdUsuario());
+            try {
+                ModelMapper modelMapper = new ModelMapper();
+                vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
+                usuarioJPA.direcciones.get(0).Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
+                usuarioJPA.direcciones.get(0).Usuario.setIdUsuario(usuario.getIdUsuario());
 //            Result resultUpdateDireccion = direccionJpaDAOImplementation.update(usuarioJPA.direcciones.get(0));
-            vPerez.ProgramacionNCapasNov2025.JPA.Result resultUpdateDireccion = direccionService.update(usuarioJPA.direcciones.get(0));
+                vPerez.ProgramacionNCapasNov2025.JPA.Result resultUpdateDireccion = direccionService.update(usuarioJPA.direcciones.get(0));
+            } catch (Exception ex) {
+                ex.getCause();
+            }
             return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
 //            return "redirect:/Usuario";
 
@@ -241,21 +248,28 @@ public class UsuarioController {
             ModelMapper modelMapper = new ModelMapper();
 //            Direccion direccion = new Direccion();
 //            usuario.direcciones.add(direccion);
-            vPerez.ProgramacionNCapasNov2025.JPA.Direccion direccionJpa = modelMapper.map(usuario.direcciones.get(0), vPerez.ProgramacionNCapasNov2025.JPA.Direccion.class);
-            direccionJpa.Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
-            direccionJpa.Usuario.setIdUsuario(usuario.getIdUsuario());
-            vPerez.ProgramacionNCapasNov2025.JPA.Result resultAddDireccion = direccionService.add(direccionJpa);
-            if (resultAddDireccion.Correct) {
-                redirectAttributes.addFlashAttribute("resultadoOperacion", resultAddDireccion.Object);
+            try {
+                vPerez.ProgramacionNCapasNov2025.JPA.Direccion direccionJpa = modelMapper.map(usuario.direcciones.get(0), vPerez.ProgramacionNCapasNov2025.JPA.Direccion.class);
+                direccionJpa.Usuario = new vPerez.ProgramacionNCapasNov2025.JPA.Usuario();
+                direccionJpa.Usuario.setIdUsuario(usuario.getIdUsuario());
+                vPerez.ProgramacionNCapasNov2025.JPA.Result resultAddDireccion = direccionService.add(direccionJpa);
+                if (resultAddDireccion.Correct) {
+                    redirectAttributes.addFlashAttribute("resultadoOperacion", resultAddDireccion.Object);
+                }
+                return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
+            } catch (Exception ex) {
+                ex.getCause();
+                return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
+
             }
-            return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
         }
 
-        return "redirect:/Usuario";
+        return "redirect:/Usuario/detail/" + usuario.getIdUsuario();
     }
 
     @GetMapping("delete/{idUsuario}")
-    public String delete(@PathVariable("idUsuario") int idUsuario, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("idUsuario") int idUsuario, RedirectAttributes redirectAttributes
+    ) {
 
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultDelete = usuarioService.delete(idUsuario);
         if (resultDelete.Correct) {
@@ -270,7 +284,8 @@ public class UsuarioController {
 
     @GetMapping("softDelete/{idUsuario}/{estatus}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result softDelete(@PathVariable("idUsuario") int idUsuario, @PathVariable("estatus") int estatus, RedirectAttributes redirectAttributes) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result softDelete(@PathVariable("idUsuario") int idUsuario, @PathVariable("estatus") int estatus, RedirectAttributes redirectAttributes
+    ) {
         Usuario usuario = new Usuario();
         usuario.setIdUsuario(idUsuario);
         usuario.setEstatus(estatus);
@@ -285,8 +300,9 @@ public class UsuarioController {
         return resultSoftDel;
     }
 
-    @DeleteMapping("direccion/delete/{idDireccion}/{idUsuario}")
-    public String deleteDireccion(@PathVariable("idDireccion") int idDireccion, @PathVariable("idUsuario") String idUsuario, RedirectAttributes redirectAttributes) {
+    @GetMapping("direccion/delete/{idDireccion}/{idUsuario}")
+    public String deleteDireccion(@PathVariable("idDireccion") int idDireccion, @PathVariable("idUsuario") String idUsuario, RedirectAttributes redirectAttributes
+    ) {
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultDelete = direccionService.delete(idDireccion);
         if (resultDelete.Correct) {
             redirectAttributes.addFlashAttribute("resultadoOperacion", resultDelete.Object);
@@ -297,34 +313,33 @@ public class UsuarioController {
     }
 
     @GetMapping("detail/{idUsuario}")
-    public String getUsuario(@PathVariable("idUsuario") int idUsuario, Model model, RedirectAttributes redirectAttributes) {
+    public String getUsuario(@PathVariable("idUsuario") int idUsuario, Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+        Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+//        Object principal = aut.getPrincipal();
+//        model permite cargar informacion desde el backend en la vistas(frontend)
+        int idUsuarioRegistrado = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
+
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
-//        Result resultRol = rolDaoImplementation.getAll();
-//        Result resultPais = paisDaoImplementation.getAll();
-//        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuario);
+
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultPais = paisService.getAll();
         model.addAttribute("Paises", resultPais.Objects);
 //        Result resultUsuario = usuarioDaoImplementation.GetById(idUsuario);
         model.addAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
+
+        model.addAttribute("UsuarioAutenticado", idUsuarioRegistrado);
         model.addAttribute("Usuario", result.Object);
 
-//            Result resultUpdate = usuarioDaoImplementation.UpdateUsuario(usuario);
-//        Result resultUpdate = new Result();
-//        resultUpdate.Correct = true;
-//        if (resultUpdate.Correct) {
-//            resultUpdate.Object = "Usuario actualizado" + idUsuario;
-//        } else {
-//            resultUpdate.Object = "Usuario  NO  actualizado" + idUsuario;
-//        }
-//        redirectAttributes.addFlashAttribute("resultUpdateUsuario", resultUpdate);
-//        redirectAttributes.addFlashAttribute("usuario", resultUsuario);
         return "detalleUsuario";
     }
 
     @GetMapping("direccionForm/{idUsuario}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result getDireccion(@PathVariable("idDireccion") int idDireccion, Model model, RedirectAttributes redirectAttributes) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getDireccion(@PathVariable("idDireccion") int idDireccion, Model model,
+            RedirectAttributes redirectAttributes
+    ) {
 //        Result result = usuarioDaoImplementation.GetDireccionUsuarioById(idUsuario);
 //        Result result = usuarioJpaDAOImplementation.getDireccionUsuarioById(idUsuario);
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = direccionService.getById(idDireccion);
@@ -339,7 +354,8 @@ public class UsuarioController {
 
     @GetMapping("getEstadoByPais/{idPais}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result  getEstadoByPais(@PathVariable int idPais) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getEstadoByPais(@PathVariable int idPais
+    ) {
 //        Result result = estadoJpaDAOImplementation.getByPais(idPais);
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = estadoService.getByPais(idPais);
 
@@ -348,7 +364,8 @@ public class UsuarioController {
 
     @GetMapping("getMunicipioByEstado/{idEstado}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result getMunicipioByEstado(@PathVariable("idEstado") int idEstado) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getMunicipioByEstado(@PathVariable("idEstado") int idEstado
+    ) {
 //        Result result = municipioJpaDAOImplementation.getByEstado(idEstado);
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = municipioService.getByEstado(idEstado);
 
@@ -357,13 +374,12 @@ public class UsuarioController {
 
     @GetMapping("getColoniaByMunicipio/{idMunicipio}")
     @ResponseBody
-    public vPerez.ProgramacionNCapasNov2025.JPA.Result getColoniaByMunicipio(@PathVariable("idMunicipio") int idMunicipio) {
+    public vPerez.ProgramacionNCapasNov2025.JPA.Result getColoniaByMunicipio(@PathVariable("idMunicipio") int idMunicipio
+    ) {
 //        Result result = coloniaDaoImplementation.getColoniaByMunicipio(idMunicipio);
         vPerez.ProgramacionNCapasNov2025.JPA.Result result = coloniaService.getByMuncipio(idMunicipio);
         return result;
     }
-
-  
 
     //Carga la pagina de carga masiva
     @GetMapping("CargaMasiva")
@@ -372,7 +388,8 @@ public class UsuarioController {
     }
 
     @PostMapping("/CargaMasiva")
-    public String CargaMasiva(@ModelAttribute MultipartFile archivo, Model model, HttpSession sesion) throws IOException {
+    public String CargaMasiva(@ModelAttribute MultipartFile archivo, Model model,
+            HttpSession sesion) throws IOException {
 
         //CARGA DE ARCHIVOS
         //divide el nombre del archivo en 2 partes, una es el nombre y la otra es despues del punto(extension) 
@@ -477,30 +494,30 @@ public class UsuarioController {
 //                    System.out.println("Encabezados");
 //                } else {
 
-                    Usuario usuario = new Usuario();
-                    usuario.setNombre(row.getCell(0).toString());
-                    usuario.setApellidoPaterno(row.getCell(1).toString());
-                    usuario.setApellidoMaterno(row.getCell(2).toString());
-                    usuario.setEmail(row.getCell(3).toString());
-                    usuario.setPassword(row.getCell(4).toString());
-                    SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-                    usuario.setFechaNacimiento(formatoFecha.parse(row.getCell(5).toString()));
-                    usuario.rol = new Rol();
-                    int IdRol = Integer.parseInt(row.getCell(6).toString());
-                    usuario.rol.setIdRol(IdRol);
-                    //  usuario.rol.setIdRol((Float.valueOf(row.getCell(6).toString().trim())).intValue());
-                    usuario.setSexo(row.getCell(7).toString());  //datos nulos
-                    usuario.setTelefono(row.getCell(8).toString());//
-                    usuario.setCelular(row.getCell(9).toString());
-                    usuario.setCurp(row.getCell(10).toString());
-                    usuario.direcciones = new ArrayList<>();
-                    usuario.direcciones.add(new Direccion());
-                    usuario.direcciones.get(0).setCalle(row.getCell(11).toString());
-                    usuario.direcciones.get(0).setNumeroInterior(row.getCell(12).toString());
-                    usuario.direcciones.get(0).setNumeroExterior(row.getCell(13).toString());
-                    usuario.direcciones.get(0).colonia = new Colonia();
-                    usuario.direcciones.get(0).colonia.setIdColonia(Integer.parseInt(row.getCell(14).toString()));
-                    usuarios.add(usuario);
+                Usuario usuario = new Usuario();
+                usuario.setNombre(row.getCell(0).toString());
+                usuario.setApellidoPaterno(row.getCell(1).toString());
+                usuario.setApellidoMaterno(row.getCell(2).toString());
+                usuario.setEmail(row.getCell(3).toString());
+                usuario.setPassword(row.getCell(4).toString());
+                SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+                usuario.setFechaNacimiento(formatoFecha.parse(row.getCell(5).toString()));
+                usuario.rol = new Rol();
+                int IdRol = Integer.parseInt(row.getCell(6).toString());
+                usuario.rol.setIdRol(IdRol);
+                //  usuario.rol.setIdRol((Float.valueOf(row.getCell(6).toString().trim())).intValue());
+                usuario.setSexo(row.getCell(7).toString());  //datos nulos
+                usuario.setTelefono(row.getCell(8).toString());//
+                usuario.setCelular(row.getCell(9).toString());
+                usuario.setCurp(row.getCell(10).toString());
+                usuario.direcciones = new ArrayList<>();
+                usuario.direcciones.add(new Direccion());
+                usuario.direcciones.get(0).setCalle(row.getCell(11).toString());
+                usuario.direcciones.get(0).setNumeroInterior(row.getCell(12).toString());
+                usuario.direcciones.get(0).setNumeroExterior(row.getCell(13).toString());
+                usuario.direcciones.get(0).colonia = new Colonia();
+                usuario.direcciones.get(0).colonia.setIdColonia(Integer.parseInt(row.getCell(14).toString()));
+                usuarios.add(usuario);
 //                }
 
             }
@@ -593,11 +610,19 @@ public class UsuarioController {
         ModelMapper modelMapper = new ModelMapper();
         vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultSearch = usuarioService.getDinamico(usuarioJPA);
-
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+
         model.addAttribute("Roles", resultRoles.Objects);
         model.addAttribute("Usuarios", resultSearch.Objects);
         model.addAttribute("usuariosEstatus", resultSearch.Objects);
+        Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = aut.getPrincipal();
+        String nombreRol = aut.getAuthorities().iterator().next().getAuthority();
+//        model permite cargar informacion desde el backend en la vistas(frontend)
+        int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
+        model.addAttribute("idUsuario", idUsuario);
+        model.addAttribute("UsuarioAutenticado", principal);
+
         return "Index";
 
     }
