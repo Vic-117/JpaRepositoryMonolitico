@@ -14,48 +14,48 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     </head>
     <body class="row p-5  justify-content-center align-items-center " style="height: 100vh;background:linear-gradient(90deg, #ffffff 0%, #ffffff848 100%); color: #293241">
-        <div class="container container-fluid  col-12 col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-4 d-flex justify-content-center  align-items-center pt-5 " style="height: 100%; flex-direction: column; box-shadow: -5px -3px 8px gray; background-color: rgba(0, 0, 0, 0.1);border-radius: 25px; border: solid 5px #293241 ">
-
-
-            <!--<i class="bi bi-person-circle m-0 mb-3"  style="font-size: 8vw;line-height: 1.5"></i>-->
-            <!--<i class="bi bi-people" style="font-size: 8vw;line-height: 1.5"></i>-->
-            <!--<i class="bi bi-door-open"  style="font-size: 8vw;line-height: 1.5"></i>-->
-            <!--<i class="bi bi-person img-fluid" style="font-size: 10vh;line-height: 1.2; color: white"></i>-->
-            <!--<i class="bi bi-person-circle"  style="font-size: 15vh;line-height: 1.5; "></i>-->
-            <h2 class=" card-text  text-wrap fs-1 " style="font-family: 'Century Gothic'; ">Bienvenido</h2>
-            <p>Inicia Sesión</p>
-            <!--FORMULARIO-->
-            <form class=" col-12 h-75 pt-5 p-4" th:action="@{/signin}" method="post" style="font-family: 'Arial'; letter-spacing: 1px">
-                <label class="form-label ">Correo:</label>
+        <div class="row justify-content-center">
+            <img class="col col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 p-0" style="border-radius: 25px 0 0 25px " alt="Imagen de Inicio" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8d2VifGVufDB8fDB8fHww">
                 
-                    
-                <div class="input-group mb-3">
-                    <i class="bi bi-envelope input-group-text fs-5"></i>
-                    <input type="text" required class="form-control  container container-fluid " name="email">
-                </div>
-                
+           
+            <div class=" col-12 col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-4 col-xxl-4 d-flex justify-content-center  align-items-center pt-5 " style="height: 100%; flex-direction: column;  background-color: rgba(0, 0, 0, 0.15);border-radius: 0 25px 25px 0;">
 
-                <label class="form-label ">Contraseña:</label>
-                <div class="input-group">
-                    <i class="bi bi-key input-group-text fs-5"></i>
-                <input type="password" required class="form-control  container container-fluid" name="password">
-                </div>
-                <label class="text-danger row fs-6 text-center mb-3"   th:if="${Error}" th:text="${MensajeError}"></label>
-                <hr class="mt-5" style="">
-                <button type="submit" class="btn btn-light container container-fluid w-100 " style="border-radius: 0">
-                    <!--<i class="bi bi-box-arrow-in-right mb-3 fs-5"></i-->
-                    <i class="bi bi-box-arrow-in-up  mb-3 fs-5"></i>
-                    Entrar
-                </button>
 
-                </label>
+                <h2 class=" card-text  text-wrap fs-1 " style="font-family: 'Century Gothic'; ">Bienvenido</h2>
+                <p>Inicia Sesión</p>
+                <!--FORMULARIO-->
+                <form class=" col-12 h-75 pt-5 p-4" th:action="@{/signin}" method="post" style="font-family: 'Arial'; ">
+                    <label class="form-label mb-3">Por favor, ingresa tu información</label>
 
-            </form>
+
+                    <div class="input-group mb-4">
+                        <i class="bi bi-envelope input-group-text fs-5"></i>
+                        <input type="text" required class="form-control  container container-fluid " placeholder="Email" name="email"style="letter-spacing: 2px">
+                    </div>
+
+
+                    <!--<label class="form-label ">Contraseña:</label>-->
+                    <div class="input-group">
+                        <i class="bi bi-key input-group-text fs-5"></i>
+                        <input type="password" required class="form-control  container container-fluid" placeholder="Contraseña" name="password">
+                    </div>
+                    <label class="text-danger row fs-6 text-center mb-3"   th:if="${Error}" th:text="${MensajeError}"></label>
+                    <hr class="mt-5" style="">
+                    <button type="submit" class="btn btn-light container container-fluid w-100 " style="border-radius: 0">
+                        <!--<i class="bi bi-box-arrow-in-right mb-3 fs-5"></i-->
+                        <i class="bi bi-box-arrow-in-up  mb-3 fs-5"></i>
+                        Entrar
+                    </button>
+
+                    </label>
+
+                </form>
+            </div>
         </div>
-<!--        <script th:if="${Error}" th:inline="javascript">
-            ()=>{
-                alert([[${MensajeError}]]);
-            }
-        </script>-->
+        <!--        <script th:if="${Error}" th:inline="javascript">
+                    ()=>{
+                        alert([[${MensajeError}]]);
+                    }
+                </script>-->
     </body>
 </html>

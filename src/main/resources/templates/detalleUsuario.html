@@ -23,42 +23,45 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 opacity: 0.6;
                 box-shadow: 1px 1px 10px buttonshadow;
             }
-            
+
             #info-user > p{
                 transition: all 450ms ease-in-out;
                 border-radius: 5px;
                 padding: 0 3px;
-/*                display: inline-block;*/
+                /*                display: inline-block;*/
             }
-            
+
             #info-user > p:hover{
                 transform: scale(1.3) ;
                 background-color: lightblue;
                 z-index: 1;
-                
+
+            }
+            body{
+                overflow-x: hidden;
             }
         </style>
     </head>
-    <body class="row w-100 h-100" style="overflow-x:hidden">
+    <body class="row " style="overflow-x:hidden; ">
 
         <!--<br>-->
         <!--SECCION DE USUARIO-->
-        <section class="card col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 mb-3 text-break" style="align-items: center; height: 99dvh" id="Seccion-Usuario" >
+        <section class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 text-break p-5 text-light" style="display: flex; flex-direction: column; align-items: center; background-color: #293241; height: 100vh " id="Seccion-Usuario" >
             <!--            <div class="card-title" id="usuario1" style="border:none">-->
 
-            <img class="card-img-top" id="usuario1" style=" width: 30vh; height: auto" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNT31I-b-Jdf8bjPM-mm-V1qCpb-oudRLvtw&s">
+            <img class="card-img-top mb-2 " id="usuario1" style=" width: 10vw; height: auto; border-radius: 100%; align-self: center"  th:src="${Usuario.imagen != null ? 'data:image/*; base64,'+Usuario.imagen : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNT31I-b-Jdf8bjPM-mm-V1qCpb-oudRLvtw&s'}">
 
 
 
             <!--</div>-->
 
-            <div class="card-title text-center fw-bold btn btn-primary" disabled th:text="|${Usuario.nombre} ${Usuario.apellidoPaterno} ${Usuario.apellidoMaterno}|" style="z-index: 101"></div>
+            <div class="card-title text-center  mb-4" disabled th:text="|${Usuario.nombre} ${Usuario.apellidoPaterno} ${Usuario.apellidoMaterno}|" style="z-index: 101; align-self: center"></div>
             <div class="card-body" id="info-user">
 
                 <!--<div class="text-center" style="font-weight: 600; font-size: 1.5rem;">INFORMACION</div>-->
                 <p th:utext="|<b>Email:</b> ${Usuario.email}|"></p>
 
-                <p  th:utext="|<b>Fecha Nacimiento:</b> ${Usuario.fechaNacimiento}|"></p>
+                <p  th:utext="|<b>Fecha Nacimiento:</b> ${#dates.format(Usuario.fechaNacimiento,'dd/MM/yyyy')}|"></p>
                 <p th:utext="|<b>Rol:</b> ${Usuario.rol.idRol}|"></p>
                 <p th:utext="|<b>Sexo:</b> ${Usuario.sexo}|"></p>
                 <p th:utext="|<b>Telefono:</b> ${Usuario.telefono}|"></p>
@@ -66,7 +69,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <p th:utext="|<b>Curp:</b> ${Usuario.curp}|"></p>
 
                 <!--<a href="url" class="btn btn-warning col-12" th:href="@{/Usuario/formularioEditable?idUsuario=}+${Usuario.idUsuario}">Editar</a>-->
-                <button class="btn btn-warning w-100"  data-bs-toggle="modal" data-bs-target="#my-modal" >Editar</button>
+                <button class="btn btn-outline-success text-light w-100 mb-3 "  data-bs-toggle="modal" data-bs-target="#my-modal" style="align-self: center" ><i class="bi bi-pencil-square p-1"></i>Editar</button>
+                <form method="POST" th:action="@{/logout}" th:if="${UsuarioAutenticado==Usuario.idUsuario}">
+                    <button  type="submit "class=" btn btn-outline-danger w-100">
+
+                        <i  class="bi bi-box-arrow-in-right fw-bold " style="font-style: initial; font-size: 1vw;display: inline-block">
+                            <span class="fw-bold">Cerrar sesión</span>
+                        </i>
+                    </button>
+
+                </form>
             </div>
 
 
@@ -75,45 +87,62 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         </section>
         <!--<br>-->
         <!--SECCION DE DIRECCION-->
-        <section class="container col-12 col-sm-12 col-md-12 col-lg-7 col-xl-8 " id="Seccion-Direccion" style="height: 99dvh; display: flex;" th:if="${Usuario.direcciones != 0}">
-            <div class="card w-100">
+        <section class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9" 
+                 id="Seccion-Direccion" 
+                 style="display: flex;" 
+                 th:if="${Usuario.direcciones != 0}">
+            <div class="p-1 w-100">
                 <div class="card-body">
-                    <div class="card-title text-center"  style="font-weight: bold; font-size: 2rem">DIRECCIONES</div>
-                    <table class="table table-striped-columns" th:if="|${#lists.size(Usuario.direcciones)>0}|">
+                    <div class="card-title mb-2" style="font-size: 1.5rem">
+                        <i class="bi bi-house-add"></i>
+                        Direcciones
+                    </div>
 
-                        <!--<th class="col-10 table-primary">#</th>-->
-                        <th class="col-9 text-center">Direccion</th>
-                        <th class="col-3">Accion</th>
-                        <tbody class="table-group-divider">
-                            <tr th:each="direccion:${Usuario.Direcciones}">
+                    <!-- Cards en lugar de tabla -->
+                    <div class="row" th:if="|${#lists.size(Usuario.direcciones) > 0}|">
+                        <div class="col-md-4 mb-3" th:each="direccion : ${Usuario.direcciones}">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Dirección -->
+                                    <p class="card-title text-center mb-4"
+                                        th:utext="|Calle. ${direccion.calle}, No.Int. ${direccion.numeroInterior}, No.Ext. ${direccion.numeroExterior}|">
+                                    </p>
 
-                                <td  th:text="|${direccion.calle} ${direccion.numeroInterior} ${direccion.numeroExterior}|"></td>
-                                <td class="text-center">
+                                    <!-- Botones de acción -->
+                                    <div class=" card-footer text-center mt-3">
+                                        <div class="btn-group w-100">
+                                            <!-- Botón Editar -->
+                                            <button class="btn btn-warning" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalDireccion"
+                                                    th:onclick="|EditarDireccion(${Usuario.idUsuario},${direccion.idDireccion})|">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
 
-                                    <div class="btn-group">
-                                        <!--BOTON EDITAR DEL MODAL DIRECCION-->
-                                        <button class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#modalDireccion" th:onclick="|EditarDireccion(${Usuario.idUsuario},${direccion.idDireccion})|">
-                                            <!--@{/Usuario/formularioEditable?idUsuario=}+${Usuario.idUsuario}-->
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-
-                                        <a class="btn btn-danger" th:href="@{/Usuario/direccion/delete/{idDireccion}/{idUsuario} (
-                                           idDireccion = ${direccion.idDireccion},idUsuario=${Usuario.idUsuario}
-                                           )}">
-                                            <i class="bi bi-x-square"></i>
-                                        </a>
+                                            <!-- Botón Eliminar -->
+                                            <a class="btn btn-danger" 
+                                               th:href="@{/Usuario/direccion/delete/{idDireccion}/{idUsuario} (
+                                               idDireccion=${direccion.idDireccion}, idUsuario=${Usuario.idUsuario}
+                                               )}">
+                                                <i class="bi bi-x-square"></i>
+                                            </a>
+                                        </div>
                                     </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button class="col-sm-12 col-xs-12  col-md-4 btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDireccion" th:onclick="AgregarDireccion()">Agregar nueva dirección</button>
+                    <!-- Botón agregar nueva dirección -->
+                    <button class="col-sm-12 col-xs-12 col-md-4 btn btn-success mt-3" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalDireccion" 
+                            th:onclick="AgregarDireccion()">
+                        Nueva dirección
+                    </button>
                 </div>
             </div>
-
-
-            <!--<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#my-modal">Ver modal</button>--> 
         </section>
 
 
@@ -131,16 +160,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
 
 
-                        <form class="needs-validation" novalidate method="post" th:object="${Usuario}" th:action="@{/Usuario/add}" style="margin:2rem; flex-direction: column">
+                        <form class="needs-validation" novalidate method="post" th:object="${Usuario}" th:action="@{/Usuario/add}" style="margin:2rem; flex-direction: column" enctype="multipart/form-data">
 
                             <input type="hidden" th:field="${Usuario.idUsuario}">
+                            <input type="hidden" th:field="*{imagen}">
                             <!--<input type="hidden" th:field="${Usuario.Direcciones[0].idDireccion}">-->
 
 
 
                             <!--SECCION DEL USUARIO-->
                             <section class="container" style="" >
-
+                                
+                                <div class="row">
+                                    <label class="container"> Imagen de perfil:</label>
+                                    <input type="file"  class="form-control mb-3" required="true" name="imagen" accept="imagen/*">
+                                </div>
 
                                 <div class=" row" style="">
 
@@ -185,10 +219,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </div>
 
 
-                                <!--                                <div class="row mb-3" style="">
-                                                                    <span class="fw-bold">Contraseña:</span>
-                                
-                                                                    <input type="password" placeholder="contraseña" class="form-control" required th:field="*{password}" onblur="passVal(this)">-->
+                               
                                 <input type="hidden" placeholder="contraseña" class="form-control" th:field="*{password}" onblur="passVal(this)">
 
                                 <!--                                    <span class="error-message mb-3 row" style="font-size: 0.8rem" />
@@ -228,13 +259,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <span class="input-group-text fw-bold ">Sexo:</span>
                                     <span class="input-group-text  col-3">Femenino:</span>
                                     <div class="input-group-text col-1" style="background-color:#A8BCD1">
-                                        <input type = "radio" value="F" id="femenino" name="sexo" class="form-check-input mt-0" th:field="*{sexo}"  th:checked="*{sexo}">
+                                        <input type = "radio" th:field="*{sexo}" value="F " id="femenino"  class="form-check-input mt-0"  >
 
 
                                     </div>
                                     <span class="input-group-text  col-3">Masculino:</span>
                                     <div class="input-group-text col-1" style="background:#A8BCD1 ">
-                                        <input type = "radio" value="M" id="masculino" name="sexo" class="form-check-input mt-0" th:field="*{sexo}" th:checked="*{sexo}" >
+                                        <input type = "radio" th:field="*{sexo}" value="M " id="masculino"  class="form-check-input mt-0">
                                     </div>
                                 </div>
 
@@ -380,7 +411,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
 
 
-
+        <!--MODAL DIRECCION-->
         <section class="modal fade" id="modalDireccion">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -412,7 +443,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <div class="row mb-3" style="">
                                     <label class="input-group-text fw-bold">calle</label>
                                     <!--INPUT-->
-                                    <input type="text" class="form-control mb-3" id="Dircalle" th:field="${Usuario.direcciones[0].calle}" onkeypress="validarCalle(event, this)">
+                                    <input type="text" class="form-control mb-3" id="Dircalle" th:field="${Usuario.direcciones[0].calle}" onkeypress="validarCalle(event, this)" required>
 
                                     <span class="error-message mb-3 row" style="font-size: 0.8rem" />
                                     <span class="text-danger mb-3 row" style="font-size: 0.8rem" th:if="${#fields.hasErrors('direcciones[0].calle')}" th:errors="$(direcciones[0].calle)"/>
@@ -422,13 +453,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <label class="input-group-text fw-bold">No.Interior</label>
 
                                     <!--INPUT-->
-                                    <input type="text" id="noInterior" class="form-control mb-3 " th:field="*{direcciones[0].numeroInterior}">
+                                    <input type="text" id="noInterior" class="form-control mb-3 " th:field="*{direcciones[0].numeroInterior}" required>
                                 </div>
 
                                 <div class="row  mb-3" style="">
                                     <!--INPUT-->
                                     <label class="input-group-text fw-bold">No.Exterior</label>
-                                    <input type="text" id="noExterior" class="form-control" th:field="*{direcciones[0].numeroExterior}">
+                                    <input type="text" id="noExterior" class="form-control" th:field="*{direcciones[0].numeroExterior}" required>
 
                                 </div>
 
@@ -443,7 +474,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
                                 <div class="row  mb-3" style="">
                                     <label class="input-group-text fw-bold" >Pais:</label>
-                                    <select class="form-control" id="ddlPais" onchange="paisddl()">
+                                    <select class="form-control" id="ddlPais" onchange="paisddl()" required>
                                         <option value="0">Elige un pais de la lista</option>
                                         <option th:each="pais:${Paises}" th:value="${pais.idPais}" th:text="${pais.nombre}"></option>
                                         <!--<option  th:value="${pais.idPais}" th:text="${pais.Nombre}"></option>-->
@@ -452,7 +483,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
                                 <div class="row mb-3">
                                     <label class="input-group-text fw-bold" >Estado:</label>
-                                    <select  class="form-control" id="ddlEstado" onchange="cambiarEstado()">
+                                    <select  class="form-control" id="ddlEstado" onchange="cambiarEstado()" required>
                                         <option value=0>Selecciona un Estado</option>
 
                                     </select>
@@ -460,14 +491,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
                                 <div class="row mb-3">
                                     <label class="input-group-text fw-bold " >Municipio:</label>
-                                    <select  class="form-control" id="ddlMunicipio" onchange="cambiaMunicipio()" th:field="*{direcciones[0].colonia.municipio.idMunicipio}">
+                                    <select  class="form-control" id="ddlMunicipio" onchange="cambiaMunicipio()" th:field="*{direcciones[0].colonia.municipio.idMunicipio}" required>
                                         <option value=0>Selecciona un Municipio</option>
                                     </select>
                                 </div>
 
                                 <div class="row mb-3">
                                     <label class="input-group-text fw-bold" >Colonia:</label>
-                                    <select class="form-control" id="ddlColonia" th:field="*{direcciones[0].colonia.idColonia}">
+                                    <select class="form-control" id="ddlColonia" th:field="*{direcciones[0].colonia.idColonia}" required>
                                         <option value=0>Selecciona la Colonia</option>
                                     </select>
                                 </div>

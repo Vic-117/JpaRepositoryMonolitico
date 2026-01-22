@@ -8,152 +8,175 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            #detalleUsuario:hover{
+                font-weight: 600;
+                border-bottom: solid 1px #e0fbfc;
+                cursor: pointer;
+
+            }
+        </style>
     </head>
-    <body class="container">
-        <nav class="navbar navbar-expand-lg  bg-primary row text-light">
-            <div class="container-fluid">
-                <i class="bi bi-person-bounding-box" style="font-style: initial; font-size: 1vw">
-                    
-                <span th:text="${UsuarioAutenticado.username}"/>
-                </i>
+    <body class="col col-12 col-lg-12">
+        <nav class="navbar navbar-expand-lg  text-light" style="background-color: #293241; height: 4rem; padding:0 2vw 0 2vw"  th:if="${UsuarioAutenticado}" >
+            <div class="container-fluid ">
+                <div class=" btn" style="border-radius: 15px; display: flex; align-items: center">
+                    <!--<i class="bi bi-person-bounding-box " style="font-style: initial; font-size: 1vw; color: white">-->
+                    <img class="card-img-top me-4 " id="usuario1" style=" width: 3rem; height: auto; border-radius: 100%; align-self: center"  th:src="${Usuario.imagen != null ? 'data:image/*; base64,'+Usuario.imagen : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNT31I-b-Jdf8bjPM-mm-V1qCpb-oudRLvtw&s'}">
+
+                    <a th:href="@{/Usuario/detail/{idUsuario} (idUsuario=${idUsuario})}" th:text="${UsuarioAutenticado.username}" style="text-decoration: none; color: white;" id="detalleUsuario"/>
+
+                    <!--</i>-->
+
+                </div>
                 <span th:text="${UsuarioAutenticado.authorities[0].authority.split('_')[1]}"/>
+                <form method="POST" th:action="@{/logout}">
+                    <button  type="submit "class=" btn btn-outline-danger">
+
+                        <i  class="bi bi-box-arrow-in-right  " style="font-style: initial; display: inline-block">
+                            <span class="">Cerrar sesión</span>
+                        </i>
+                    </button>
+
+                </form>
             </div>
+            <div class="col-12 col-sm-12 col-lg-2 d-flex justify-content-end  btn-group btn-group-sm " >
+
+                <a th:href='@{/Usuario/CargaMasiva}' class="btn btn-outline-success me-1  text-light " >
+                    <i class="bi bi-file-earmark-plus-fill" style="font-size: 1rem"></i>
+                    <!--<br>-->
+                    <span style="font-size: 0.8rem">cargar</span>
+                </a>
+                <a th:href='@{/Usuario/UsuarioDireccionForm}' class="btn btn-outline-success text-light" >
+                    <i class="bi bi-person-fill-add fw-bold" style="font-size: 1rem"></i>
+                    <!--<br>-->
+                    <span style="font-size: 0.8rem">Agregar</span> 
+                </a>
+
+            </div>
+
         </nav>
         <!--<br>-->
 
-        <div class="row">
 
-            <div class="container">
+        <!--BARRA DE BUSQUEDA-->
 
 
-                <h2 class="mb-3 fw-bold">LISTA DE USUARIOS</h2>
+        <section class="navbar mb-5" style="background-color: #293241;padding: 2vh 5px">
+            <div class="container-fluid">
+                <div class="row w-100 align-items-center g-3"> 
+
+                    <form class="col-12 col-lg-12" method="post" th:object="${UsuarioBusqueda}" th:action="@{/Usuario/Search}" >
+                        <div class="input-group">
+                            <label class="input-group-text">Buscar</label>
+
+                            <input type="text" class="form-control col-3" placeholder="Nombre" th:field="*{Nombre}" />
+                            <input type="text" class="form-control col-3" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}"/>
+                            <input type="text" class="form-control d-none d-md-block col-3" placeholder="Apellido Materno" th:field="*{ApellidoMaterno}" /> <select class="form-control" th:field="*{rol.idRol}">
+                                <option value="0" class="col-3">Selecciona un rol</option>
+                                <option th:each="rol:${Roles}" th:text="${rol.nombre}" th:value="${rol.idRol}"></option>
+                            </select>
+
+                            <button type="submit" class="btn btn-warning"><i class="bi bi-search"></i></button>
+                            <a class="btn btn-dark me-1" th:href="@{/Usuario}"> <i class="bi bi-arrow-counterclockwise"></i></a>
+                        </div>
+                    </form>
+
+                    <!--                    <div class="col-12 col-lg-1 d-flex justify-content-end  btn-group btn-group-sm " >
+                    
+                                            <a th:href='@{/Usuario/CargaMasiva}' class="btn btn-outline-success me-1  text-light " >
+                                                <i class="bi bi-file-earmark-plus-fill" style="font-size: 1rem"></i>
+                                                <br>
+                                                <span style="font-size: 0.8rem">cargar</span>
+                                            </a>
+                                            <a th:href='@{/Usuario/UsuarioDireccionForm}' class="btn btn-outline-success text-light" >
+                                                <i class="bi bi-person-fill-add fw-bold" style="font-size: 1rem"></i>
+                                                <br>
+                                                <span style="font-size: 0.8rem">Agregar</span> 
+                                            </a>
+                    
+                                        </div>-->
+
+                </div>
+            </div>
+        </section>
+        <div class="p-4">
+
+
+
+
+
+
+
+            <div class="container mb-3">
+
+
+                <h3 class="mb-3 text-center" style="font-family: sans-serif">USUARIOS REGISTRADOS</h3>
 
 
             </div>
-
-
-
-
-
-            <!--BARRA DE BUSQUEDA-->
-
-            <!--            <section class="navbar bg-body-tertiary row">
-                            <form class="col-6" method="post" th:object="${UsuarioBusqueda}" th:action="@{Usuario/Search}">
-                                <div class="input-group ">
-                                    <label class="input-group-text col-1">BUSCAR</label> 
-                                    <input type="text" class="form-control " placeholder="Nombre"  th:field="*{Nombre}"/>
-                                    <input type="text" class="form-control " placeholder="Apellido Paterno"  th:field="*{ApellidoPaterno}"/>
-                                    <input type="text" class="form-control " placeholder="Apellido Materno" th:field="*{ApellidoMaterno}" />
-                                    <input type="text" class="form-control" placeholder="Rol" th:field="*{rol.nombre}"/>
-            
-                                    <select class="form-control"  th:field="*{rol.idRol}">
-                                        <option value="0">Selecciona un rol</option>
-                                        <option th:each="rol:${Roles}"  th:text="${rol.nombre}" th:value="${rol.idRol}"></option>
-                                    </select>    
-            
-            
-                                    <button type="submit" class="btn btn-warning"><i class="bi bi-search"></i></button>
-                                </div>
-            
-                            </form>
-            
-                            <div class="input-group col-6">
-            
-                                <a th:href='@{/Usuario/CargaMasiva}' class="btn btn-outline-success ">Carga masiva</a>
-                                <br>
-                                <a th:href='@{/Usuario/UsuarioDireccionForm}' class="btn btn-outline-success">Agregar usuario</a>
-                            </div>
-                        </section>-->
-
-            <section class="navbar bg-body-tertiary" >
-                <div class="container-fluid">
-                    <div class="row w-100 align-items-center g-3"> 
-
-                        <form class="col-12 col-lg-9" method="post" th:object="${UsuarioBusqueda}" th:action="@{/Usuario/Search}">
-                            <div class="input-group">
-                                <label class="input-group-text">BUSCAR</label>
-
-                                <input type="text" class="form-control col-3" placeholder="Nombre" th:field="*{Nombre}"/>
-                                <input type="text" class="form-control col-3" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}"/>
-                                <input type="text" class="form-control d-none d-md-block col-3" placeholder="Apellido Materno" th:field="*{ApellidoMaterno}" /> <select class="form-control" th:field="*{rol.idRol}">
-                                    <option value="0" class="col-3">Selecciona un rol</option>
-                                    <option th:each="rol:${Roles}" th:text="${rol.nombre}" th:value="${rol.idRol}"></option>
-                                </select>
-
-                                <button type="submit" class="btn btn-warning"><i class="bi bi-search"></i></button>
-                                <a class="btn btn-dark me-1" th:href="@{/Usuario}"> <i class="bi bi-arrow-counterclockwise"></i></a>
-                            </div>
-                        </form>
-
-                        <div class="col-12 col-lg-3 d-flex justify-content-end align-items-center">
-
-                            <a th:href='@{/Usuario/CargaMasiva}' class="btn btn-outline-success me-1">Carga masiva</a>
-                            <a th:href='@{/Usuario/UsuarioDireccionForm}' class="btn btn-outline-success">Agregar usuario</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <!--TABLA DE USUARIOS-->
-            <table class="table  table-hover table-responsive align-middle  table-bordered  col-sm-12 rounded" >
-                <!--cabeceras de tabla-->
-                <thead class="table-dark text-center"style="color:#054070">
-                <th class="col-2" >Nombre Completo</th>
-                <th class="col-4">Información</th>
-                <th class="col-4" >Direccion</th>
-                <th class="col-1" style="color:green">Acciones</th> 
-                <th class="col-1" style="color:green">Desactivar</th> 
-                </thead>
+            <div class="table-responsive rounded">
+                <table class="table  table-hover table-striped table-responsive align-middle " >
+                    <!--cabeceras de tabla-->
+                    <thead class="table-dark text-center">
+                    <th class="col-2" >Nombre Completo</th>
+                    <th class="col-4">Información</th>
+                    <th class="col-4" >Direccion</th>
+                    <th class="col-1" >Acciones</th> 
+                    <th class="col-1" >Desactivar</th> 
+                    </thead>
 
-                <!--filas de la tabla-->
-                <tr th:each = "usuario:${Usuarios}" th:id="|filasTabla${usuario.idUsuario}|">
+                    <!--filas de la tabla-->
+                    <tr th:each = "usuario:${Usuarios}" th:id="|filasTabla${usuario.idUsuario}|">
 
-                    <!--celdas/datos de la tabla-->
-                    <td th:text="|${usuario.nombre} ${usuario.apellidoPaterno} ${usuario.apellidoMaterno}|"/>
+                        <!--celdas/datos de la tabla-->
+                        <td th:text="|${usuario.nombre} ${usuario.apellidoPaterno} ${usuario.apellidoMaterno}|"/>
 
-                    <td th:utext="|<b> Correo:</b> ${usuario.email}.<br><b>Fecha de Nacimiento:</b> ${usuario.fechaNacimiento}<br><b>Sexo:</b> ${usuario.sexo} <br><b>Telefono:</b> 
-                        ${usuario.telefono}<br><b>Celular:</b> ${usuario.celular} <br><b>Curp:</b> ${usuario.curp}<br><b>Rol:</b> ${usuario.rol.nombre} |"/>
+                        <td th:utext="|<b> Correo:</b> ${usuario.email}.<br><b>Fecha de Nacimiento:</b> ${#dates.format(usuario.fechaNacimiento,'dd/MM/yyyy')}<br><b>Sexo:</b> ${usuario.sexo} <br><b>Telefono:</b> 
+                            ${usuario.telefono}<br><b>Celular:</b> ${usuario.celular} <br><b>Curp:</b> ${usuario.curp}<br><b>Rol:</b> ${usuario.rol.nombre} |"/>
 
-                    <td >
-                        <ul th:if="${usuario.Direcciones !=null}" >
-                            <li th:each = "direccion:${usuario.Direcciones}" th:text="|Calle. ${direccion.calle}. No.Interior. ${direccion.numeroInterior}. No.Exterior. ${direccion.numeroExterior}. CodPos. ${direccion.colonia.CodigoPostal}. col. ${direccion.colonia.nombre}|"></li>
-                        </ul>
-                        <ul th:unless="${usuario.Direcciones ==null}" >
-                            <p ></p>
-                        </ul>
-
-
-
-                    <td class="text-center" th:id=|td${usuario.idUsuario}| >
-                        <!--<button class="btn btn-danger" th:href="@{Usuario/delete/{idUsuario} (idUsuario = ${usuario.IdUsuario})}">-->
-                        <!--Llamamos a la funcion de forma dinamica con thymeleaf-->
-                        <button class="btn border-danger mb-2 col-8" th:if="${usuario.estatus}==1" th:onclick="|EliminarUsuario(${usuario.idUsuario})|">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-
-                        <a href="url" class="btn border-info col-8" th:if="${usuario.estatus}==1" th:href="@{/Usuario/detail/{idUsuario} (idUsuario=${usuario.idUsuario})}">
-
-
-                            <i class="bi bi-vector-pen"></i>
-                        </a>
+                        <td >
+                            <ul th:if="${usuario.Direcciones !=null}" >
+                                <li th:each = "direccion:${usuario.Direcciones}" th:text="|Calle. ${direccion.calle}. No.Interior. ${direccion.numeroInterior}. No.Exterior. ${direccion.numeroExterior}. CodPos. ${direccion.colonia.CodigoPostal}. col. ${direccion.colonia.nombre}|"></li>
+                            </ul>
+                            <ul th:unless="${usuario.Direcciones ==null}" >
+                                <p ></p>
+                            </ul>
 
 
 
-                    </td>
+                        <td class="text-center" th:id=|td${usuario.idUsuario}| >
+                            <!--<button class="btn btn-danger" th:href="@{Usuario/delete/{idUsuario} (idUsuario = ${usuario.IdUsuario})}">-->
+                            <!--Llamamos a la funcion de forma dinamica con thymeleaf-->
+                            <button class="btn border-danger mb-2 col-8" th:if="${usuario.estatus}==1" th:onclick="|EliminarUsuario(${usuario.idUsuario})|">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
 
-                    <td class="text-center" style="background-color: aliceblue">
-                        <div class="form-check form-switch text-center col-12">
-                            <input class="form-check-input" type="checkbox" role="switch" th:id="'switch'+${usuario.idUsuario}"  th:checked="${usuario.estatus} == 1"  th:onchange="|mensajeCheck(this,'${usuario.estatus}' , '${usuario.idUsuario}' )|" >
-
-                        </div>
-                    </td>
-
-
-                </tr>
+                            <a href="url" class="btn border-info col-8" th:if="${usuario.estatus}==1" th:href="@{/Usuario/detail/{idUsuario} (idUsuario=${usuario.idUsuario})}">
 
 
+                                <i class="bi bi-vector-pen"></i>
+                            </a>
 
-            </table>
+
+
+                        </td>
+
+                        <td class="text-center" >
+                            <div class="form-check form-switch text-center col-12">
+                                <input class="form-check-input" type="checkbox" role="switch" th:id="'switch'+${usuario.idUsuario}"  th:checked="${usuario.estatus} == 1"  th:onchange="|mensajeCheck(this,'${usuario.estatus}' , '${usuario.idUsuario}' )|" >
+
+                            </div>
+                        </td>
+
+
+                    </tr>
+
+
+
+                </table>
+            </div>
 
         </div>
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>

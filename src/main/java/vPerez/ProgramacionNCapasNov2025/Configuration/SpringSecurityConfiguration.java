@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.AntPathMatcher;
 import vPerez.ProgramacionNCapasNov2025.service.UserDetailsService;
 
 /**
@@ -29,7 +31,8 @@ public class SpringSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(config -> config.requestMatchers("/Usuario/**","/login")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
+        http.authorizeHttpRequests(config -> config.requestMatchers("/login/**").permitAll().
+                requestMatchers("/Usuario/**")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
                 .hasAnyRole("Administrador","Usuario").anyRequest().authenticated()
         )
                 .formLogin(
@@ -41,12 +44,15 @@ public class SpringSecurityConfiguration {
                                 .failureUrl("/login?error=true")
                                 .permitAll()
                 )
-//                .logout(
-//                        logout -> logout
-//                                .logoutUrl("/logout")
-//                                .logoutSuccessUrl("/login?logout=true")
-//                                .permitAll()
-//                )
+                .logout(
+                        logout -> logout
+                                .logoutUrl("/logout")//El que dispara el formulario POST de la vista
+                                .logoutSuccessUrl("/login/logout") //endpoint del controlador
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
+                                .deleteCookies("JSESSIONID")
+                                .permitAll()
+                )
                 .userDetailsService(userDetailsService);
 
         return http.build();

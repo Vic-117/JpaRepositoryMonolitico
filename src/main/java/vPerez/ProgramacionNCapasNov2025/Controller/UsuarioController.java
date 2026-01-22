@@ -622,6 +622,8 @@ public class UsuarioController {
         int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
         model.addAttribute("idUsuario", idUsuario);
         model.addAttribute("UsuarioAutenticado", principal);
+          model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
+        
 
         return "Index";
 

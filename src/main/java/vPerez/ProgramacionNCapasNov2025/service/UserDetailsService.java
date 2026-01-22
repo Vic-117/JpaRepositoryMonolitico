@@ -27,10 +27,20 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = iUsuarioJpaRepository.findByEmail(email);
-        
+       
+       boolean desactivado;
+       desactivado = usuario.getEstatus() == 0 ? true:false;
+//        if(usuario.getEstatus() == 0){
+//            desactivado = true;
+//        }else{
+//            desactivado = false;
+//        }
         return User.withUsername(usuario.getEmail())
                 .password(usuario.getPassword())
-                .roles(usuario.rol.getNombre()).build();
+                .roles(usuario.rol.getNombre()).
+                disabled(desactivado)
+                .build();
+                
         
     }
     

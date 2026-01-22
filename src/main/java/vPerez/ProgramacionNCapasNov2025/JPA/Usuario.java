@@ -19,27 +19,30 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
  * @author digis
  */
 @Entity
-@Table(name="usuario")
+@Table(name = "usuario")
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="idusuario")
-     private int idUsuario;
-    @Column(name="username")
+    @Column(name = "idusuario")
+    private int idUsuario;
+    @Column(name = "username")
     private String nombre;
-    @Column(name="apellidopaterno")
+    @Column(name = "apellidopaterno")
     private String apellidoPaterno;
     @Column(name = "apellidomaterno")
     private String apellidoMaterno;
     private String email;
     private String password;
-    @Column(name="fechanacimiento")
+    @Column(name = "fechanacimiento")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
     @JoinColumn(name = "idrol")
     @ManyToOne
@@ -49,9 +52,11 @@ public class Usuario {
     private String celular;
     private String curp;
     private int estatus;
-     @JsonIgnore
+    @Column(name = "imagen")
+    private String imagen;
+    @JsonIgnore
 //    @OneToMany(mappedBy = "Usuario",  cascade = CascadeType.ALL,  orphanRemoval = true,fetch = FetchType.LAZY)//Con cacadeType.ALL las operaciones afectan tambien a las otras entidades
-    @OneToMany(mappedBy = "Usuario",  cascade = CascadeType.REMOVE,  orphanRemoval = true,fetch = FetchType.LAZY)//Con cacadeType.ALL las operaciones afectan tambien a las otras entidades
+    @OneToMany(mappedBy = "Usuario", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)//Con cacadeType.ALL las operaciones afectan tambien a las otras entidades
     public List<Direccion> direcciones = new ArrayList<>();//Relacion del lado de 1, un usuario tiene muchas direcciones, esta vez inicializado
 
     public int getIdUsuario() {
@@ -149,14 +154,15 @@ public class Usuario {
     public void setCurp(String curp) {
         this.curp = curp;
     }
-    
-    public int getEstatus(){
+
+    public int getEstatus() {
         return estatus;
     }
 
-    public void setEstatus(int estatus){
+    public void setEstatus(int estatus) {
         this.estatus = estatus;
     }
+
     public List<Direccion> getDirecciones() {
         return direcciones;
     }
@@ -164,6 +170,15 @@ public class Usuario {
     public void setDirecciones(List<Direccion> direcciones) {
         this.direcciones = direcciones;
     }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
     
     
+
 }

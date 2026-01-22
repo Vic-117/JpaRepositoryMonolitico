@@ -73,6 +73,7 @@ public class Usuario {
     @Min(value = 0)
     @Max(value = 1)
     private int estatus;
+    private String imagen;
 //    private List<Direccion> direcciones = new ArrayList<>();//Relacion del lado de 1, un usuario tiene muchas direcciones
     @NotNull(message = "Ingresa una direccion")
     public List<Direccion> direcciones;//Relacion del lado de 1, un usuario tiene muchas direcciones
@@ -195,7 +196,6 @@ public class Usuario {
     public void setEstatus(int estatus) {
         this.estatus = estatus;
     }
-    
 
     public List<Direccion> getDirecciones() {
         return direcciones;
@@ -204,5 +204,15 @@ public class Usuario {
     public void setDirecciones(List<Direccion> direcciones) {
         this.direcciones = direcciones;
     }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+    
+    
 
 }

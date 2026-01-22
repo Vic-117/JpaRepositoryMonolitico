@@ -7,6 +7,7 @@ package vPerez.ProgramacionNCapasNov2025.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -32,10 +33,7 @@ public class UsuarioService {
     @Autowired
     private IDireccionJpaRepository direccionJpaRepository;
 
-//    public UsuarioService(IUsuarioJpaRepository usuarioJpaRepository) {
-//        this.usuarioJpaRepository = usuarioJpaRepository;
-//        
-//    }
+
     @Transactional
     public Result getAll() {
         Result result = new Result();
@@ -131,6 +129,7 @@ public class UsuarioService {
 //            Usuario usuario = new Usuario();
             Optional<Usuario> usuario = usuarioJpaRepository.findById(idUsuario);
             result.Object = usuario.get();
+            
             result.Correct = true;
 
         } catch (Exception e) {
@@ -139,7 +138,7 @@ public class UsuarioService {
             result.ex = e;
         }
         return result;
-    }//AGREGADO DOMINGO
+    }
 
     @Transactional
     public Result getDinamico(Usuario usuario) {
