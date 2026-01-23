@@ -24,6 +24,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -130,7 +132,7 @@ public class UsuarioController {
     @Autowired
     private ColoniaService coloniaService;
 
-    @GetMapping
+    @GetMapping()
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
 
         Authentication aut = SecurityContextHolder.getContext().getAuthentication();
@@ -141,12 +143,14 @@ public class UsuarioController {
         if (nombreRol.equals("ROLE_Usuario")) {
             return "redirect:/Usuario/detail/" + idUsuario;
         } else {
-            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll();
+
+            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll(0);
+            Page<Usuario> paginacion = (Page<Usuario>) result.Object;
             model.addAttribute("idUsuario", idUsuario);
             model.addAttribute("UsuarioAutenticado", principal);
             model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
-
-            model.addAttribute("Usuarios", result.Objects);
+            model.addAttribute("Usuarios", paginacion.getContent());
+            model.addAttribute("paginacion", paginacion);
             model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
             vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
 //        Result resultRoles = rol
@@ -154,6 +158,34 @@ public class UsuarioController {
             model.addAttribute("usuariosEstatus", result.Objects);
             return "Index";
         }
+    }
+
+    @GetMapping("/navegar")
+    public String getList(@RequestParam("pagina") int pagina, Model model, RedirectAttributes redirectAtriAttributes) {
+        Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = aut.getPrincipal();
+        String nombreRol = aut.getAuthorities().iterator().next().getAuthority();
+//        model permite cargar informacion desde el backend en la vistas(frontend)
+        int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
+        if (nombreRol.equals("ROLE_Usuario")) {
+            return "redirect:/Usuario/detail/" + idUsuario;
+        } else {
+            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll(pagina);
+            Page<Usuario> paginacion = (Page<Usuario>) result.Object;
+
+            model.addAttribute("idUsuario", idUsuario);
+            model.addAttribute("UsuarioAutenticado", principal);
+            model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
+            model.addAttribute("paginacion", paginacion);
+            model.addAttribute("Usuarios", paginacion.getContent());
+            model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+//        Result resultRoles = rol
+            model.addAttribute("Roles", resultRoles.Objects);
+            model.addAttribute("usuariosEstatus", result.Objects);
+            return "Index";
+        }
+
     }
 
     @GetMapping("UsuarioDireccionForm")
@@ -168,7 +200,7 @@ public class UsuarioController {
     }
 
     @PostMapping("add")
-    public String addAlumnoDireccion(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, 
+    public String addAlumnoDireccion(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
             @ModelAttribute("imagen") MultipartFile imagen, @ModelAttribute("imagen") String imagenPerfil) {
 //        imagen.getBytes();
         try {
@@ -177,7 +209,7 @@ public class UsuarioController {
                 if (extension.equals("jpg") || extension.equals("jpg") || extension.equals("jpeg")) {
                     usuario.setImagen(Base64.getEncoder().encodeToString(imagen.getBytes()));
                 }
-            }else{
+            } else {
                 usuario.setImagen(imagenPerfil);
             }
         } catch (Exception ex) {
@@ -193,19 +225,19 @@ public class UsuarioController {
 
                 return "UsuarioDireccionForm";
             } else {
-            //AGREGADO RECIENTEMENTE SOLO EL IF
-            ModelMapper modelMapper = new ModelMapper();
+                //AGREGADO RECIENTEMENTE SOLO EL IF
+                ModelMapper modelMapper = new ModelMapper();
 
-            vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJpa = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
+                vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJpa = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
 
-            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.add(usuarioJpa);
+                vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.add(usuarioJpa);
 
-            if (!result.Correct) {
-                model.addAttribute("ErroresC", "Sucedio un error.");
-                return "UsuarioDireccionForm";
-            }
+                if (!result.Correct) {
+                    model.addAttribute("ErroresC", "Sucedio un error.");
+                    return "UsuarioDireccionForm";
+                }
 
-            redirectAttributes.addFlashAttribute("ResultAgregar", "El usuario se agregó con exito"); // Agregado
+                redirectAttributes.addFlashAttribute("ResultAgregar", "El usuario se agregó con exito"); // Agregado
 
             }
         } else if (usuario.getIdUsuario() > 0 && usuario.direcciones == null) { // editar usuario
@@ -622,8 +654,7 @@ public class UsuarioController {
         int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
         model.addAttribute("idUsuario", idUsuario);
         model.addAttribute("UsuarioAutenticado", principal);
-          model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
-        
+        model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
 
         return "Index";
 

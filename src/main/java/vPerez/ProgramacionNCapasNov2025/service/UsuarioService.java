@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,11 +38,20 @@ public class UsuarioService {
 
 
     @Transactional
-    public Result getAll() {
+    public Result getAll(int numeroPagina) {
         Result result = new Result();
+//        Result resultPagina = new Result();
+        
         try {
-//            result.Objects = new ArrayList<>();
-            result.Objects = usuarioJpaRepository.findAll(Sort.by("idUsuario").descending());
+            result.Objects = new ArrayList<>();
+//            result.Objects = usuarioJpaRepository.findAll(Sort.by("idUsuario").descending());
+            
+            Pageable pageable = PageRequest.of(numeroPagina, 10,Sort.by("idUsuario").descending());
+            Page<Usuario> paginaUsuario = usuarioJpaRepository.findAll(pageable);
+            
+
+           result.Object = paginaUsuario;
+//           result.Objects.add( usuarioJpaRepository.findAll(pageable));
             result.Correct = true;
         } catch (Exception ex) {
             result.Correct = false;
@@ -222,5 +234,7 @@ public class UsuarioService {
         }
         return result;
     }
+    
+    
 
 }

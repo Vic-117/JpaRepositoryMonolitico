@@ -176,12 +176,50 @@
 
 
                 </table>
+
+
+                <nav aria-label="Page navigation example" >
+                    <ul class="pagination justify-content-center">
+                        <!-- Botón anterior -->
+                        <li class="page-item" th:classappend="${!paginacion.hasPrevious()} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/Usuario/page(pagina=${paginacion.number - 1})}">
+                                <i class="bi bi-arrow-left-short fs-4"></i>
+                            </a>
+                        </li>
+
+                        <!-- Números de página -->
+                        <li class="page-item"
+                            th:each="pagina : ${#numbers.sequence(0, paginacion.totalPages - 1)}"
+                            th:classappend="${pagina == paginacion.number} ? 'active'">
+                            <a th:if="${pagina == 0}" class="page-link fs-4"
+                               th:href="@{/Usuario/navegar(pagina=${pagina})}"
+                               ><i class="bi bi-house"></i></a>
+                            <a th:if="${pagina != 0}" class="page-link fs-4"
+                               th:href="@{/Usuario/navegar(pagina=${pagina})}"
+                               th:text="${pagina }"></a>
+
+                        </li>
+
+                        <!-- Botón siguiente -->
+                        <li class="page-item" th:classappend="${!paginacion.hasNext()} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/Usuario/navegar(pagina=${paginacion.number + 1})}">
+                                <i class="bi bi-arrow-right-short fs-4"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+
+
             </div>
 
         </div>
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 
         <script th:if="${resultDelete}" th:inline="javascript">
+
             console.log([[${resultDelete}]]);
             if ([[${resultDelete.Correct}]]){
             Swal.fire({
