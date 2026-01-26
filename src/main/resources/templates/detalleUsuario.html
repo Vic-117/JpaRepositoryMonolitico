@@ -49,7 +49,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <section class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 text-break p-5 text-light" style="display: flex; flex-direction: column; align-items: center; background-color: #293241; height: 100vh " id="Seccion-Usuario" >
             <!--            <div class="card-title" id="usuario1" style="border:none">-->
 
-            <img class="card-img-top mb-2 " id="usuario1" style=" width: 10vw; height: auto; border-radius: 100%; align-self: center"  th:src="${Usuario.imagen != null ? 'data:image/*; base64,'+Usuario.imagen : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNT31I-b-Jdf8bjPM-mm-V1qCpb-oudRLvtw&s'}">
+            <img class="card-img-top mb-2 img-fluid " id="usuario1" style=" width: 135px; height: auto; border-radius: 100%; align-self: center"  th:src="${Usuario.imagen != null ? 'data:image/*; base64,'+Usuario.imagen : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNT31I-b-Jdf8bjPM-mm-V1qCpb-oudRLvtw&s'}">
 
 
 
@@ -61,15 +61,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <!--<div class="text-center" style="font-weight: 600; font-size: 1.5rem;">INFORMACION</div>-->
                 <div class="row">
 
-                    <i class="bi bi-envelope-at-fill col col-1"></i>
-                    <p th:utext="|<b>Email:</b> ${Usuario.email}|" class="col col-10"></p>
+                    <p th:utext="|<b>Email:</b> ${Usuario.email}|" >
+                    
+                        
+                    </p>
                 </div>
 
                 <div class="row">
-                    <i class="bi bi-calendar-date-fill col col-1" >
-                    </i>
-                    <p class="col col-7">Fecha Nacimiento</p>
-                    <p  th:utext="|${#dates.format(Usuario.fechaNacimiento,'dd/MM/yyyy')}|" class="col col-4"></p>
+<!--                    <i class="bi bi-calendar-date-fill col col-1" >
+                    </i>-->
+                    <!--<p class="col col-7">Fecha Nacimiento</p>-->
+                    <p  th:utext="|<b> Fecha Nacimiento: </b> ${#dates.format(Usuario.fechaNacimiento,'dd/MM/yyyy')}  |" class="col col-12"></p>
                 </div>
 
                 <div>
@@ -98,8 +100,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <form method="POST" th:action="@{/logout}" th:if="${UsuarioAutenticado==Usuario.idUsuario}">
                     <button  type="submit "class=" btn btn-outline-danger w-100">
 
-                        <i  class="bi bi-box-arrow-in-right fw-bold " style="font-style: initial; font-size: 1vw;display: inline-block">
-                            <span class="fw-bold">Cerrar sesión</span>
+                        <i  class="bi bi-box-arrow-in-right fw-bold w-100" style="font-style: initial;display: inline-block">
+                            <span class="fw-bold ">Cerrar sesión</span>
                         </i>
                     </button>
 
@@ -185,7 +187,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
 
 
-                        <form class="needs-validation" novalidate method="post" th:object="${Usuario}" th:action="@{/Usuario/add}" style="margin:2rem; flex-direction: column" enctype="multipart/form-data">
+                        <form class="needs-validation " novalidate method="post" th:object="${Usuario}" th:action="@{/Usuario/add}" style="margin:2rem; flex-direction: column" enctype="multipart/form-data">
 
                             <input type="hidden" th:field="${Usuario.idUsuario}">
                             <input type="hidden" th:field="*{imagen}">
@@ -280,16 +282,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <br>
 
 
+                                    <span class="input-group-text fw-bold row">Sexo:</span>
                                 <div class="row mb-3" onmouseleave="validarSexo()" style="">
-                                    <span class="input-group-text fw-bold ">Sexo:</span>
-                                    <span class="input-group-text  col-3">Femenino:</span>
-                                    <div class="input-group-text col-1" style="background-color:#A8BCD1">
+                                    <span class="input-group-text   col-sm-12  col-md-8 col-lg-5">Femenino:</span>
+                                    <div class="input-group-text  col-sm-12 col-md-4 col-lg-1" style="background-color:#A8BCD1">
                                         <input type = "radio" th:field="*{sexo}" value="F " id="femenino"  class="form-check-input mt-0"  >
 
 
                                     </div>
-                                    <span class="input-group-text  col-3">Masculino:</span>
-                                    <div class="input-group-text col-1" style="background:#A8BCD1 ">
+                                    <span class="input-group-text   col-sm-12  col-md-8 col-lg-5">Masculino:</span>
+                                    <div class="input-group-text col-sm-12  col-md-4 col-lg-1" style="background:#A8BCD1 ">
                                         <input type = "radio" th:field="*{sexo}" value="M " id="masculino"  class="form-check-input mt-0">
                                     </div>
                                 </div>
@@ -412,9 +414,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             
                                                             <button type="submit" class="btn btn-success col-12" th:if="${(Usuario.idUsuario !=0 && Usuario.direcciones[0].IdDireccion > 0 )}">Editar</button> 
                                                         </section>-->
-                            <div class="text-center">
+                            <div class="text-center  row">
 
-                                <button type="submit" class="btn  btn-outline-success col-2">Guardar</button> 
+                                <button type="submit" class="btn  btn-outline-success col col-sm-12 col-md-6 col-lg-4 ">Guardar</button> 
 
                             </div>
 

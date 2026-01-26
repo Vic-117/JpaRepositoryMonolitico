@@ -155,7 +155,7 @@ public class UsuarioController {
             vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
 //        Result resultRoles = rol
             model.addAttribute("Roles", resultRoles.Objects);
-            model.addAttribute("usuariosEstatus", result.Objects);
+            model.addAttribute("usuariosEstatus", paginacion.getContent());
             return "Index";
         }
     }
@@ -642,11 +642,15 @@ public class UsuarioController {
         ModelMapper modelMapper = new ModelMapper();
         vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultSearch = usuarioService.getDinamico(usuarioJPA);
-        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
-
-        model.addAttribute("Roles", resultRoles.Objects);
-        model.addAttribute("Usuarios", resultSearch.Objects);
-        model.addAttribute("usuariosEstatus", resultSearch.Objects);
+        if(resultSearch.Objects.size() == 0){
+            model.addAttribute("Empty","No hay resultados para tu busqueda");
+        }else{
+        
+            vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+            model.addAttribute("Roles", resultRoles.Objects);
+            model.addAttribute("Usuarios", resultSearch.Objects);
+            model.addAttribute("usuariosEstatus", resultSearch.Objects);
+        }
         Authentication aut = SecurityContextHolder.getContext().getAuthentication();
         Object principal = aut.getPrincipal();
         String nombreRol = aut.getAuthorities().iterator().next().getAuthority();

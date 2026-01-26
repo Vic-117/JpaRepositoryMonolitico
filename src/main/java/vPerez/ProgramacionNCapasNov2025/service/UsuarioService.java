@@ -46,7 +46,7 @@ public class UsuarioService {
             result.Objects = new ArrayList<>();
 //            result.Objects = usuarioJpaRepository.findAll(Sort.by("idUsuario").descending());
             
-            Pageable pageable = PageRequest.of(numeroPagina, 10,Sort.by("idUsuario").descending());
+            Pageable pageable = PageRequest.of(numeroPagina, 3,Sort.by("idUsuario").descending());
             Page<Usuario> paginaUsuario = usuarioJpaRepository.findAll(pageable);
             
 
