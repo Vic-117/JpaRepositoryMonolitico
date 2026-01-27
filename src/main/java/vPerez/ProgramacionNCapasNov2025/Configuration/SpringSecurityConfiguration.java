@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.AntPathMatcher;
+import vPerez.ProgramacionNCapasNov2025.service.CustomFailureHandler;
 import vPerez.ProgramacionNCapasNov2025.service.UserDetailsService;
 
 /**
@@ -24,10 +25,13 @@ import vPerez.ProgramacionNCapasNov2025.service.UserDetailsService;
 public class SpringSecurityConfiguration {
 
     private UserDetailsService userDetailsService;
-
-    public SpringSecurityConfiguration(UserDetailsService userDetailsService) {
+    private CustomFailureHandler customFailureHandler;
+            
+    public SpringSecurityConfiguration(UserDetailsService userDetailsService,CustomFailureHandler customFailureHandler ) {
         this.userDetailsService = userDetailsService;
+        this.customFailureHandler = customFailureHandler;
     }
+    
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,6 +42,7 @@ public class SpringSecurityConfiguration {
                 .formLogin(
                         form -> form
                                 .defaultSuccessUrl("/Usuario", true)
+                                .failureHandler(customFailureHandler)
                                 .usernameParameter("email")
                                 .loginPage("/login")//Url del endpoint de la pagina
                                 .loginProcessingUrl("/signin")//endpoint para procesar formulario() manejado por sprinf security(Es lo mismo que se escribe en el formulario)

@@ -81,7 +81,7 @@
 
         <section class="mb-5" style="background-color:#293241; padding:1rem">
             <div class="container-fluid ">
-                <form method="post" th:object="${UsuarioBusqueda}" th:action="@{/Usuario/Search}">
+                <form method="get" th:object="${UsuarioBusqueda}" th:action="@{/Usuario/Search}">
                     <div class="row g-2 align-items-center">
 
                         <!-- Label solo desktop -->
@@ -153,6 +153,9 @@
 
 
             </div>
+            <center th:if="${Empty}">
+                <h5 th:text="${Empty}"></h5>
+            </center> 
             <!--TABLA DE USUARIOS-->
             <div class="table-responsive rounded">
                 <table th:if = "${Usuarios}" class="table  table-hover table-striped table-responsive align-middle " >
@@ -215,10 +218,10 @@
 
                 </table>
 
-                <div class="row w-100">
+                <div class="row w-100"  th:if="${paginacion}">
                     <p class="col col-12 text-center" th:text="${Empty}"></p>
                 </div>
-                <nav aria-label="Page navigation example" >
+                <nav aria-label="Page navigation example"  th:if="${paginacion}">
                     <ul class="pagination justify-content-center">
                         <!-- Botón anterior -->
                         <li class="page-item" th:classappend="${!paginacion.hasPrevious()} ? 'disabled'">
@@ -329,7 +332,8 @@
                     //Cuando la peticion fue exitosa:
                     success: function (data, textStatus, jqXHR) {
                     if (data.Correct) {
-                    window.location.href = "/Usuario";
+//                    window.location.href = "/Usuario";
+                    window.location.reload();
                     }
                     },
                     //Cuando hubo error en la petición 
@@ -354,7 +358,8 @@
                     success: function (data, textStatus, jqXHR) {
                     if (data.Correct) {
                     console.log("Usuario desactivado");
-                    window.location.href = "/Usuario";
+//                    window.location.href = "/Usuario";
+                    window.location.reload();
 //                    $(this).css("opacity", "1");
 //                    var id = "#filasTabla"+idUsuario;
 //                     $(id).addClass("text-decoration-line-through");

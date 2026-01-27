@@ -182,7 +182,7 @@ public class UsuarioController {
             vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
 //        Result resultRoles = rol
             model.addAttribute("Roles", resultRoles.Objects);
-            model.addAttribute("usuariosEstatus", result.Objects);
+            model.addAttribute("usuariosEstatus", paginacion.getContent());
             return "Index";
         }
 
@@ -634,7 +634,7 @@ public class UsuarioController {
         return "redirect:/Usuario";
     }
 
-    @PostMapping("/Search")
+    @GetMapping("/Search")
     public String buscarUsuarios(@ModelAttribute("Usuario") Usuario usuario, Model model) {
         model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
 //        Result resultSearch = usuarioDaoImplementation.search(usuario);
