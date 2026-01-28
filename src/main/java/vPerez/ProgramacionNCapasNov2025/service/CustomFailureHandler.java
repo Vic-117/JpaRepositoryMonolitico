@@ -26,8 +26,10 @@ public class CustomFailureHandler implements AuthenticationFailureHandler{
         if(exception instanceof DisabledException){
             sesionHttp.setAttribute("isDisable",true);
             sesionHttp.setAttribute("ErrorMessage","Usuario desabilitado, por favor pidele al administrador que reactive tu cuenta");
+            response.sendRedirect("/login/UserDisabled");
+        } else {
+            response.sendRedirect("/login?error=true");
         }
-        response.sendRedirect("/UserDisabled");
     }
     
 }

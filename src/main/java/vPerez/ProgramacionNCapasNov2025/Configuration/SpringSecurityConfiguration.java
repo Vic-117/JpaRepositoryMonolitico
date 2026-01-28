@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.AntPathMatcher;
 import vPerez.ProgramacionNCapasNov2025.service.CustomFailureHandler;
+import vPerez.ProgramacionNCapasNov2025.service.CustomSuccessHandler;
 import vPerez.ProgramacionNCapasNov2025.service.UserDetailsService;
 
 /**
@@ -26,27 +27,32 @@ public class SpringSecurityConfiguration {
 
     private UserDetailsService userDetailsService;
     private CustomFailureHandler customFailureHandler;
+    private CustomSuccessHandler customSuccessHandler;
             
-    public SpringSecurityConfiguration(UserDetailsService userDetailsService,CustomFailureHandler customFailureHandler ) {
+    public SpringSecurityConfiguration(UserDetailsService userDetailsService,CustomFailureHandler customFailureHandler, CustomSuccessHandler customSuccessHandler) {
         this.userDetailsService = userDetailsService;
         this.customFailureHandler = customFailureHandler;
+        this.customSuccessHandler = customSuccessHandler;
     }
     
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(config -> config.requestMatchers("/login/**").permitAll().
-                requestMatchers("/Usuario/**")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
-                .hasAnyRole("Administrador","Usuario").anyRequest().authenticated()
+        http.authorizeHttpRequests(config -> config.requestMatchers("/login/**","/Usuario/getMunicipioByEstado/**","/Usuario/getEstadoByPais/**","/Usuario/getColoniaByMunicipio/**","/Usuario/direccionForm/**").permitAll()               
+                .requestMatchers("/Usuario/detail")
+                .hasAnyRole("Usuario")
+                .requestMatchers("/Usuario/**")//Rutas a las que se accede sin contraseña(las rutas despues de la principal)
+                .hasAnyRole("Administrador")
+                .anyRequest().authenticated()
         )
                 .formLogin(
                         form -> form
-                                .defaultSuccessUrl("/Usuario", true)
+                                .successHandler(customSuccessHandler)
                                 .failureHandler(customFailureHandler)
                                 .usernameParameter("email")
                                 .loginPage("/login")//Url del endpoint de la pagina
                                 .loginProcessingUrl("/signin")//endpoint para procesar formulario() manejado por sprinf security(Es lo mismo que se escribe en el formulario)
-                                .failureUrl("/login?error=true")
+//                                .failureUrl("/login?error=true")
                                 .permitAll()
                 )
                 .logout(

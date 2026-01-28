@@ -138,11 +138,10 @@ public class UsuarioController {
         Authentication aut = SecurityContextHolder.getContext().getAuthentication();
         Object principal = aut.getPrincipal();
         String nombreRol = aut.getAuthorities().iterator().next().getAuthority();
-//        model permite cargar informacion desde el backend en la vistas(frontend)
         int idUsuario = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
-        if (nombreRol.equals("ROLE_Usuario")) {
-            return "redirect:/Usuario/detail/" + idUsuario;
-        } else {
+//        if (nombreRol.equals("ROLE_Usuario")) {
+//            return "redirect:/Usuario/detail";
+//        } else {
 
             vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll(0);
             Page<Usuario> paginacion = (Page<Usuario>) result.Object;
@@ -157,7 +156,8 @@ public class UsuarioController {
             model.addAttribute("Roles", resultRoles.Objects);
             model.addAttribute("usuariosEstatus", paginacion.getContent());
             return "Index";
-        }
+//    }
+        
     }
 
     @GetMapping("/navegar")
@@ -365,6 +365,28 @@ public class UsuarioController {
         model.addAttribute("Usuario", result.Object);
 
         return "detalleUsuario";
+    }
+
+    @GetMapping("detail")
+    public String getUsuario(Model model) {
+        Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+//        Object principal = aut.getPrincipal();
+//        model permite cargar informacion desde el backend en la vistas(frontend)
+        int idUsuarioRegistrado = (Integer) usuarioService.getIdByEmail(aut.getName()).Object;
+
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getById(idUsuarioRegistrado);
+
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRol = rolService.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultPais = paisService.getAll();
+        model.addAttribute("Paises", resultPais.Objects);
+//        Result resultUsuario = usuarioDaoImplementation.GetById(idUsuario);
+        model.addAttribute("Roles", resultRol.Objects);//Agregado 12/12/2025
+
+        model.addAttribute("UsuarioAutenticado", idUsuarioRegistrado);
+        model.addAttribute("Usuario", result.Object);
+
+        return "detalleUsuario";
+
     }
 
     @GetMapping("direccionForm/{idUsuario}")
@@ -642,10 +664,10 @@ public class UsuarioController {
         ModelMapper modelMapper = new ModelMapper();
         vPerez.ProgramacionNCapasNov2025.JPA.Usuario usuarioJPA = modelMapper.map(usuario, vPerez.ProgramacionNCapasNov2025.JPA.Usuario.class);
         vPerez.ProgramacionNCapasNov2025.JPA.Result resultSearch = usuarioService.getDinamico(usuarioJPA);
-        if(resultSearch.Objects.size() == 0){
-            model.addAttribute("Empty","No hay resultados para tu busqueda");
-        }else{
-        
+        if (resultSearch.Objects.size() == 0) {
+            model.addAttribute("Empty", "No hay resultados para tu busqueda");
+        } else {
+
             vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
             model.addAttribute("Roles", resultRoles.Objects);
             model.addAttribute("Usuarios", resultSearch.Objects);

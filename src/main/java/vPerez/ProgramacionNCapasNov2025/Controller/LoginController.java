@@ -4,6 +4,7 @@
  */
 package vPerez.ProgramacionNCapasNov2025.Controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,20 +22,26 @@ public class LoginController {
 
     @GetMapping
     public String login(@RequestParam(required = false) boolean error, Model model) {
-        if(error){
-            model.addAttribute("Error",error);
-            model.addAttribute("MensajeError","Usuario o contraseña incorrectos");
+        if (error) {
+            model.addAttribute("Error", error);
+            model.addAttribute("MensajeError", "Usuario o contraseña incorrectos");
             System.out.println(error);
-        }else{
-            System.out.println(error);
-        
-        }
+        } 
         return "Login";
     }
-    
-     @GetMapping("/logout")
-    public String logout(){
+
+    @GetMapping("/logout")
+    public String logout() {
         return "Logout";
+    }
+
+    @GetMapping("/UserDisabled")
+    public String usuarioDeshabilitado(HttpSession session, Model model) {
+        // Recuperamos los mensajes que guardaste en el Handler
+        String message = (String) session.getAttribute("ErrorMessage");
+        model.addAttribute("mensaje", message);
+
+        return "UserDisabled";
     }
 
 }
