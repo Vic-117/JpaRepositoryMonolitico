@@ -4,6 +4,8 @@
  */
 package vPerez.ProgramacionNCapasNov2025.ML;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -12,7 +14,7 @@ import jakarta.validation.constraints.Size;
  * @author digis
  */
 public class Colonia {
-
+    @Min(value = 1,message = "Escoge una colonia")
     private int idColonia;
     @NotNull(message = "Falta la colonia")
     @Size(min=1, max = 49)
@@ -20,7 +22,8 @@ public class Colonia {
     @NotNull(message = "Falta el cp")
     private String codigoPostal;
 //    Municipio municipio = new Municipio();
-    @NotNull(message = "Falta el cp")
+    @NotNull
+//    @Valid
     public Municipio municipio;
 
     public int getIdColonia() {

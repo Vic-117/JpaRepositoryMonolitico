@@ -4,32 +4,39 @@
  */
 package vPerez.ProgramacionNCapasNov2025.ML;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  *
  * @author digis
  */
 public class Municipio {
+
+    @Min(value = 1, message = "Escoge un Municipio")
     private int idMunicipio;
-     @NotNull(message = "Falta elnombre del municipio")
+    @NotNull(message = "Falta el nombre del municipio")
+    @Size(min = 2, max = 50, message = "Escoge tu Municipio")
     private String nombre;
-    @NotNull(message = "Falta el estado")
+    @NotNull
+//    @Valid
     public Estado estado;
-    
-    public int getIdMunicipio(){
+
+    public int getIdMunicipio() {
         return idMunicipio;
     }
-    
-    public void setIdMunicipio(int idMunicipio){
+
+    public void setIdMunicipio(int idMunicipio) {
         this.idMunicipio = idMunicipio;
     }
-    
-    public String getNombre(){
+
+    public String getNombre() {
         return nombre;
     }
-    
-    public void setNombre(String nombre){
+
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
@@ -40,8 +47,5 @@ public class Municipio {
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
-    
-    
-    
-    
+
 }

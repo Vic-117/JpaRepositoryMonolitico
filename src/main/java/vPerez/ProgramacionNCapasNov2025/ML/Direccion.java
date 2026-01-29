@@ -4,6 +4,7 @@
  */
 package vPerez.ProgramacionNCapasNov2025.ML;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,7 +28,8 @@ public class Direccion {
     @NotNull(message = "Escribe tu numero exterior")
     @NotEmpty(message = "Escribe tu numero exterior")
     private String numeroExterior;
-    @NotNull(message = "Ingresa una direccion")
+    @NotNull(message = "Ingresa una colonia")
+//    @Valid
     public Colonia colonia;
     
 // public Usuario usuario;//RELACION DEL LADO DE MUCHOS,Muchas direcciones son parte de un Usuario

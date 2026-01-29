@@ -4,6 +4,7 @@
  */
 package vPerez.ProgramacionNCapasNov2025.ML;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -75,7 +76,7 @@ public class Usuario {
     private int estatus;
     private String imagen;
 //    private List<Direccion> direcciones = new ArrayList<>();//Relacion del lado de 1, un usuario tiene muchas direcciones
-    @NotNull(message = "Ingresa una direccion")
+    @Valid
     public List<Direccion> direcciones;//Relacion del lado de 1, un usuario tiene muchas direcciones
 
     public Usuario() {
@@ -212,7 +213,5 @@ public class Usuario {
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
-    
-    
 
 }

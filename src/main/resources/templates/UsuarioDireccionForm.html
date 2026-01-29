@@ -47,7 +47,7 @@
 
             <input type="hidden" th:field="${Usuario.idUsuario}">
             <!--a veces da -1 y otras 1-->
-            <input type="hidden" th:field="${Usuario.Direcciones[0].idDireccion}">
+            <input type="hidden" th:field="${Usuario.direcciones[0].idDireccion}">
             <input type="hidden" id="estatus" th:field="${Usuario.estatus}">
 
 
@@ -219,18 +219,20 @@
                     <label class="input-group-text fw-bold">calle</label>
                     <input type="text" class="form-control mb-3" th:field="${Usuario.direcciones[0].calle}" onkeypress="validarCalle(event, this)">
                     <span class="error-message mb-3 row" style="font-size: 0.8rem" />
-                    <span class="text-danger mb-3 row" style="font-size: 0.8rem" th:if="${#fields.hasErrors('direcciones[0].calle')}" th:errors="$(direcciones[0].calle)"/>
+                    <span class="text-danger mb-3 row" style="font-size: 0.8rem" th:if="${#fields.hasErrors('direcciones[0].calle')}" th:errors="*{direcciones[0].calle}"/>
                 </div>
 
                 <div class="row  mb-3" style="">
 
                     <label class="input-group-text fw-bold">No.Interior</label>
                     <input type="text" class="form-control mb-3 " th:field="*{direcciones[0].numeroInterior}">
+                     <span class="text-danger mb-3 row" style="font-size: 0.8rem" th:if="${#fields.hasErrors('direcciones[0].numeroInterior')}" th:errors="*{direcciones[0].numeroInterior}"/>
                 </div>
 
                 <div class="row  mb-3" style="">
                     <label class="input-group-text fw-bold">No.Exterior</label>
                     <input type="text" class="form-control" th:field="*{direcciones[0].numeroExterior}">
+                    <span class="text-danger mb-3 row" style="font-size: 0.8rem"  th:if="${#fields.hasErrors('direcciones[0].numeroExterior')}" th:errors="*{direcciones[0].numeroExterior}"/>
 
                 </div>
 
@@ -243,21 +245,23 @@
 
                 <div class="row  mb-3" style="">
                     <label class="input-group-text fw-bold" >Pais:</label>
-                    <select class="form-control" id="ddlPais" >
+                    <select class="form-control" id="ddlPais"  th:field="*{direcciones[0].colonia.municipio.estado.pais.idPais}">
                         <!--th:field="${Usuario.direcciones[0].colonia.municipio.estado.pais}"-->
                         <!--                     usuario.direcciones.get(0).getColonia().getMunicipio().getEstado().pais.setIdPais(resultSet.getInt("IDPAIS"));-->
                         <option value="0">Elige un pais de la lista</option>
                         <option th:each="pais:${Paises}" th:value="${pais.idPais}" th:text="${pais.nombre}"></option>
                         <!--<option  th:value="${pais.IdPais}" th:text="${pais.Nombre}"></option>-->
                     </select>
+                    <span class="text-danger mb-3 row" th:if="${#fields.hasErrors('direcciones[0].colonia.municipio.estado.pais.idPais')}" th:errors="*{direcciones[0].colonia.municipio.estado.pais.idPais}"/>
                 </div>
 
                 <div class="row mb-3">
                     <label class="input-group-text fw-bold" >Estado:</label>
-                    <select  class="form-control" id="ddlEstado">
+                    <select  class="form-control" id="ddlEstado" th:field="*{direcciones[0].colonia.municipio.estado.idEstado}">
                         <option value=0>Selecciona un Estado</option>
 
                     </select>
+                    <span class="text-danger mb-3 row"th:if="${#fields.hasErrors('direcciones[0].colonia.municipio.estado.idEstado')}" th:errors="*{direcciones[0].colonia.municipio.estado.idEstado}" />
                 </div>
 
                 <div class="row mb-3">
@@ -265,6 +269,7 @@
                     <select  class="form-control" id="ddlMunicipio"  th:field="*{direcciones[0].colonia.municipio.idMunicipio}">
                         <option value=0>Selecciona un Municipio</option>
                     </select>
+                    <span class="text-danger mb-3 row" th:if="${#fields.hasErrors('direcciones[0].colonia.municipio.idMunicipio')}" th:Errors="*{direcciones[0].colonia.municipio.idMunicipio}"/>
                 </div>
 
                 <div class="row mb-3">
@@ -272,6 +277,8 @@
                     <select class="form-control" id="ddlColonia" th:field="*{direcciones[0].colonia.idColonia}">
                         <option value=0>Selecciona la Colonia</option>
                     </select>
+                    
+                    <span class="text-danger mb-3 row" th:if="${#fields.hasErrors('direcciones[0].colonia.idColonia')}" th:Errors="*{direcciones[0].colonia.idColonia}"
                 </div>
 
 

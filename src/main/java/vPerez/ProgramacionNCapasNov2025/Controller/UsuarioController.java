@@ -33,8 +33,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -132,7 +134,13 @@ public class UsuarioController {
     @Autowired
     private ColoniaService coloniaService;
 
-    @GetMapping()
+    @InitBinder
+public void initBinder(WebDataBinder binder) {
+    // Ignora el campo "imagen" durante el binding
+    binder.setDisallowedFields("imagen");
+}
+
+    @GetMapping
     public String getAll(Model model, RedirectAttributes redirectAtriAttributes) {
 
         Authentication aut = SecurityContextHolder.getContext().getAuthentication();
@@ -143,21 +151,21 @@ public class UsuarioController {
 //            return "redirect:/Usuario/detail";
 //        } else {
 
-            vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll(0);
-            Page<Usuario> paginacion = (Page<Usuario>) result.Object;
-            model.addAttribute("idUsuario", idUsuario);
-            model.addAttribute("UsuarioAutenticado", principal);
-            model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
-            model.addAttribute("Usuarios", paginacion.getContent());
-            model.addAttribute("paginacion", paginacion);
-            model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
-            vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
+        vPerez.ProgramacionNCapasNov2025.JPA.Result result = usuarioService.getAll(0);
+        Page<Usuario> paginacion = (Page<Usuario>) result.Object;
+        model.addAttribute("idUsuario", idUsuario);
+        model.addAttribute("UsuarioAutenticado", principal);
+        model.addAttribute("Usuario", usuarioService.getById(idUsuario).Object);
+        model.addAttribute("Usuarios", paginacion.getContent());
+        model.addAttribute("paginacion", paginacion);
+        model.addAttribute("UsuarioBusqueda", new Usuario());//creando usuario(vacio) para que pueda mandarse la busqueda
+        vPerez.ProgramacionNCapasNov2025.JPA.Result resultRoles = rolService.getAll();
 //        Result resultRoles = rol
-            model.addAttribute("Roles", resultRoles.Objects);
-            model.addAttribute("usuariosEstatus", paginacion.getContent());
-            return "Index";
+        model.addAttribute("Roles", resultRoles.Objects);
+        model.addAttribute("usuariosEstatus", paginacion.getContent());
+        return "Index";
 //    }
-        
+
     }
 
     @GetMapping("/navegar")
@@ -219,9 +227,12 @@ public class UsuarioController {
 
             if (bindingResult.hasErrors()) {
 //                Result result = rolDaoImplementation.getAll();
+                vPerez.ProgramacionNCapasNov2025.JPA.Result resultPais = paisService.getAll();
                 vPerez.ProgramacionNCapasNov2025.JPA.Result result = rolService.getAll();
                 model.addAttribute("Roles", result.Objects);
+                model.addAttribute("Paises", resultPais.Objects);
                 model.addAttribute("Usuario", usuario);
+                System.out.println(bindingResult.getFieldErrors());
 
                 return "UsuarioDireccionForm";
             } else {
